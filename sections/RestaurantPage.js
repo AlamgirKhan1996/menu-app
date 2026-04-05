@@ -7,6 +7,7 @@ import StickyOrderBar from "@/components/StickyOrderBar";
 import HeroSection    from "@/sections/HeroSection";
 import MenuSection    from "@/sections/MenuSection";
 import { addToCart, removeFromCart, deleteFromCart, clearCart } from "@/utils/cart";
+import StickyOrderButton from "components/StickyOrderButton";
 
 /**
  * RestaurantPage — the full client-side restaurant ordering experience.
@@ -79,6 +80,20 @@ export default function RestaurantPage({ client }) {
 
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <HeroSection client={client} />
+      <div style={{
+  background: "rgba(0,0,0,0.6)",
+  padding: "6px 12px",
+  borderRadius: "999px",
+  fontSize: 13,
+  marginTop: 10,
+  display: "inline-block",
+  color: "#fff"
+}}>
+  🔥 120+ orders today
+</div>
+<p style={{ fontSize: 14, opacity: 0.8, marginTop: 8 }}>
+  📲 Order in seconds • 🚀 Fast delivery • ⭐ Rated {client.rating}
+</p>
 
       {/* ── Menu ───────────────────────────────────────────────────────── */}
       <MenuSection
@@ -135,3 +150,5 @@ export default function RestaurantPage({ client }) {
     </>
   );
 }
+
+<StickyOrderButton client={client} cart={cart} />

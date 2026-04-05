@@ -145,9 +145,9 @@ export default function MenuCard({ item, qty, onAdd, onRemove, accentColor, inde
         }}>
           <span style={{
             fontFamily: "var(--font-display)",
-            fontWeight:  700,
+            fontWeight:  "bold",
             fontSize:    18,
-            color:      "var(--ink)",
+            color:      "#FF6B35",
           }}>
             SAR {item.price}
           </span>
