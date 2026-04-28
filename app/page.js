@@ -5,5 +5,5 @@ import { redirect } from "next/navigation";
  * In production, you'd redirect to a marketing page or client login.
  */
 export default function RootPage() {
-  redirect("/smash-kitchen");
+  redirect("/restaurant-auth/signin");
 }
