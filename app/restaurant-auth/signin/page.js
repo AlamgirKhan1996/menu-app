@@ -1,13 +1,12 @@
 "use client";
 
-// app/auth/signin/page.js
-
+import { Suspense } from "react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function SigninPage() {
+function SigninForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -33,13 +32,7 @@ export default function SigninPage() {
     });
 
     if (result?.error) {
-      setError(
-        result.error === "No account found with this email"
-          ? "No account found with this email address"
-          : result.error === "Incorrect password"
-          ? "Incorrect password. Please try again."
-          : "Login failed. Please check your details."
-      );
+      setError("Incorrect email or password.");
       setLoading(false);
       return;
     }
@@ -56,7 +49,7 @@ export default function SigninPage() {
     padding: "12px 14px",
     color: "#fff",
     fontSize: 14,
-    fontFamily: "'Inter', sans-serif",
+    fontFamily: "inherit",
     outline: "none",
     boxSizing: "border-box",
   };
@@ -73,24 +66,26 @@ export default function SigninPage() {
       fontFamily: "'Inter', sans-serif",
     }}>
 
-      {/* Logo */}
       <div style={{ marginBottom: 32, textAlign: "center" }}>
         <div style={{
-          width: 56, height: 56, background: "#25D366", borderRadius: 16,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 28, margin: "0 auto 14px",
-        }}>
-          💬
-        </div>
+          width: 56, height: 56,
+          background: "#25D366",
+          borderRadius: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 28,
+          margin: "0 auto 14px",
+        }}>💬</div>
         <div style={{ fontSize: 24, fontWeight: 800, color: "#fff" }}>OrderFlow</div>
         <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", marginTop: 4 }}>
           Restaurant Dashboard
         </div>
       </div>
 
-      {/* Card */}
       <div style={{
-        width: "100%", maxWidth: 400,
+        width: "100%",
+        maxWidth: 400,
         background: "#111416",
         border: "1px solid rgba(255,255,255,.08)",
         borderRadius: 16,
@@ -103,14 +98,16 @@ export default function SigninPage() {
           Manage orders, menu, and analytics
         </div>
 
-        {searchParams.get("error") === "SessionRequired" && (
-          <div style={{ background: "rgba(37,211,102,.08)", border: "1px solid rgba(37,211,102,.2)", borderRadius: 8, padding: "10px 14px", color: "#25D366", fontSize: 13, marginBottom: 20 }}>
-            Please sign in to access your dashboard
-          </div>
-        )}
-
         {error && (
-          <div style={{ background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", borderRadius: 8, padding: "10px 14px", color: "#EF4444", fontSize: 13, marginBottom: 20 }}>
+          <div style={{
+            background: "rgba(239,68,68,.1)",
+            border: "1px solid rgba(239,68,68,.3)",
+            borderRadius: 8,
+            padding: "10px 14px",
+            color: "#EF4444",
+            fontSize: 13,
+            marginBottom: 20,
+          }}>
             {error}
           </div>
         )}
@@ -128,8 +125,6 @@ export default function SigninPage() {
               onChange={handleChange}
               required
               style={inputStyle}
-              onFocus={(e) => { e.target.style.borderColor = "rgba(37,211,102,.5)"; }}
-              onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,.1)"; }}
             />
           </div>
 
@@ -145,8 +140,6 @@ export default function SigninPage() {
               onChange={handleChange}
               required
               style={inputStyle}
-              onFocus={(e) => { e.target.style.borderColor = "rgba(37,211,102,.5)"; }}
-              onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,.1)"; }}
             />
           </div>
 
@@ -163,7 +156,6 @@ export default function SigninPage() {
               fontSize: 15,
               fontWeight: 800,
               cursor: loading ? "not-allowed" : "pointer",
-              transition: "all .2s",
             }}
           >
             {loading ? "Signing in..." : "Sign In →"}
@@ -172,11 +164,19 @@ export default function SigninPage() {
 
         <div style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
           No account yet?{" "}
-          <Link href="/auth/signup" style={{ color: "#25D366", fontWeight: 600 }}>
+          <Link href="/restaurant-auth/signup" style={{ color: "#25D366", fontWeight: 600 }}>
             Create restaurant account
           </Link>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SigninPage() {
+  return (
+    <Suspense fallback={<div style={{ background: "#0A0C0E", minHeight: "100vh" }} />}>
+      <SigninForm />
+    </Suspense>
   );
 }
