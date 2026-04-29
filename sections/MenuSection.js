@@ -11,7 +11,8 @@ export default function MenuSection({ client, cart, onAdd, onRemove }) {
   const sectionRef = useRef(null);
 
   /* Filter menu by category + search */
-  const filtered = client.menu.filter((item) => {
+  const menuItems = client.menu || [];
+  const filtered = menuItems.filter((item) => {
     const matchCat  = activeCategory === "All" || item.category === activeCategory;
     const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         item.desc.toLowerCase().includes(searchQuery.toLowerCase());
