@@ -1,7 +1,7 @@
 "use client";
 
 import { formatOrderMessage, buildWhatsAppLink, getOrderTotal, getItemCount } from "@/utils/whatsapp";
-import { deleteFromCart } from "@/utils/cart";
+import { saveOrderToDB } from "@/utils/database";
 
 function CartItem({ item, onAdd, onRemove, onDelete, accentColor }) {
   return (
@@ -288,40 +288,35 @@ export default function CartDrawer({ client, cart, onAdd, onRemove, onDelete, on
             </div>
 
             {/* WhatsApp order button */}
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display:        "flex",
-                alignItems:     "center",
-                justifyContent: "center",
-                gap:             10,
-                width:          "100%",
-                padding:        "16px",
-                borderRadius:   "var(--radius-lg)",
-                background:     "#25D366",
-                color:          "#fff",
-                fontFamily:    "var(--font-body)",
-                fontWeight:     700,
-                fontSize:       16,
-                textDecoration: "none",
-                boxShadow:     "0 8px 32px rgba(37,211,102,0.35)",
-                transition:    "transform 0.2s var(--ease), box-shadow 0.2s",
-                animation:     "popIn 0.4s var(--ease-bounce)",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform  = "scale(1.02)";
-                e.currentTarget.style.boxShadow  = "0 12px 40px rgba(37,211,102,0.45)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform  = "scale(1)";
-                e.currentTarget.style.boxShadow  = "0 8px 32px rgba(37,211,102,0.35)";
-              }}
-            >
-              <span style={{ fontSize: 20 }}>💬</span>
-              Send Order via WhatsApp
-            </a>
+            <button
+  onClick={async () => {
+    await saveOrderToDB({
+      restaurantSlug: client.slug,
+      items: cart,
+    });
+    window.open(waLink, "_blank");
+  }}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    width: "100%",
+    padding: "16px",
+    borderRadius: "var(--radius-lg)",
+    background: "#25D366",
+    color: "#fff",
+    fontFamily: "var(--font-body)",
+    fontWeight: 700,
+    fontSize: 16,
+    border: "none",
+    cursor: "pointer",
+    boxShadow: "0 8px 32px rgba(37,211,102,0.35)",
+  }}
+>
+  <span style={{ fontSize: 20 }}>💬</span>
+  Send Order via WhatsApp
+</button>
 
             <p style={{
               textAlign: "center",
