@@ -57,16 +57,10 @@ export default function RestaurantPage({ client }) {
 
   /* ── Inject per-client accent colour as CSS variable ───────────────────── */
   useEffect(() => {
-    document.documentElement.style.setProperty("--accent", client.accentColor);
-    document.documentElement.style.setProperty(
-      "--accent-light",
-      `${client.accentColor}18`
-    );
-    document.documentElement.style.setProperty(
-      "--accent-glow",
-      `${client.accentColor}30`
-    );
-  }, [client.accentColor]);
+  document.documentElement.style.setProperty("--accent", client.accentColor || "#25D366");
+  document.documentElement.style.setProperty("--accent-light", `${client.accentColor || "#25D366"}18`);
+  document.documentElement.style.setProperty("--accent-glow", `${client.accentColor || "#25D366"}30`);
+}, [client.accentColor]);
 
   return (
     <>

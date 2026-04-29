@@ -8,7 +8,11 @@ export async function PUT(request, { params }) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { name, nameAr, description, price, categoryId, emoji, isAvailable, isFeatured } = body;
+  const {
+    name, nameAr, description, descriptionAr,
+    price, categoryId, image, images,
+    isAvailable, isFeatured,
+  } = body;
 
   const item = await prisma.menuItem.update({
     where: { id: params.id, restaurantId: session.user.restaurantId },
@@ -16,8 +20,10 @@ export async function PUT(request, { params }) {
       name,
       nameAr: nameAr || null,
       description: description || null,
+      descriptionAr: descriptionAr || null,
       price: parseFloat(price),
-      image: emoji || null,
+      image: image || null,
+      images: images || [],
       isAvailable,
       isFeatured,
       categoryId,

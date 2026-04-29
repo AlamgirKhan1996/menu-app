@@ -4,111 +4,133 @@ import { useEffect, useState } from "react";
 
 export default function HeroSection({ client }) {
   const [loaded, setLoaded] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setLoaded(true), 100); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <section style={{
-      position:   "relative",
-      overflow:   "hidden",
-      background:  client.coverGradient,
-      padding:    "56px 24px 64px",
-      color:      "#fff",
+      position: "relative",
+      overflow: "hidden",
+      color: "#fff",
     }}>
-      {/* Decorative circles */}
-      <div style={{
-        position:     "absolute", top: -60, right: -60,
-        width:         220, height: 220, borderRadius: "50%",
-        background:   "rgba(255,255,255,0.04)",
-        pointerEvents: "none",
-      }} />
-      <div style={{
-        position:     "absolute", bottom: -40, left: -40,
-        width:         160, height: 160, borderRadius: "50%",
-        background:   "rgba(255,255,255,0.04)",
-        pointerEvents: "none",
-      }} />
 
-      <div style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
-
-        {/* Emoji logo */}
+      {/* Banner Image */}
+      <div style={{
+        height: 200,
+        background: client.coverImage
+          ? `url(${client.coverImage}) center/cover no-repeat`
+          : client.coverGradient,
+        position: "relative",
+      }}>
         <div style={{
-          width:          80, height: 80,
-          borderRadius:  "var(--radius-xl)",
-          background:    "rgba(255,255,255,0.12)",
-          backdropFilter: "blur(20px)",
-          border:        "1px solid rgba(255,255,255,0.18)",
-          display:       "flex",
-          alignItems:    "center",
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(to bottom, rgba(0,0,0,.1), rgba(0,0,0,.7))",
+        }} />
+      </div>
+
+      {/* Info Row */}
+      <div style={{
+        background: "#fff",
+        padding: "0 20px 20px",
+        position: "relative",
+      }}>
+
+        {/* Logo - overlaps banner */}
+        <div style={{
+          width: 80, height: 80,
+          borderRadius: 18,
+          background: client.logo
+            ? `url(${client.logo}) center/cover`
+            : client.coverGradient,
+          border: "4px solid #fff",
+          marginTop: -40,
+          marginBottom: 12,
+          display: "flex",
+          alignItems: "center",
           justifyContent: "center",
-          fontSize:       42,
-          marginBottom:   24,
-          opacity:        loaded ? 1 : 0,
-          transform:      loaded ? "none" : "scale(0.8)",
-          transition:    "opacity 0.5s var(--ease), transform 0.5s var(--ease)",
-          animation:     loaded ? "float 4s ease-in-out infinite 0.5s" : "none",
+          fontSize: 36,
+          boxShadow: "0 4px 20px rgba(0,0,0,.15)",
+          overflow: "hidden",
+          flexShrink: 0,
         }}>
-          {client.emoji}
+          {!client.logo && client.emoji}
         </div>
 
-        {/* Name */}
+        {/* Name + Tagline */}
         <h1 style={{
-          fontFamily:    "var(--font-display)",
-          fontWeight:     900,
-          fontSize:      "clamp(32px, 7vw, 56px)",
-          lineHeight:     1.05,
-          letterSpacing: "-0.03em",
-          marginBottom:   10,
-          opacity:        loaded ? 1 : 0,
-          transform:      loaded ? "none" : "translateY(16px)",
-          transition:    "opacity 0.6s var(--ease) 0.1s, transform 0.6s var(--ease) 0.1s",
+          fontFamily: "var(--font-display)",
+          fontWeight: 900,
+          fontSize: "clamp(22px, 5vw, 32px)",
+          lineHeight: 1.1,
+          letterSpacing: "-0.02em",
+          marginBottom: 6,
+          color: "var(--ink)",
+          opacity: loaded ? 1 : 0,
+          transform: loaded ? "none" : "translateY(10px)",
+          transition: "opacity .5s ease, transform .5s ease",
         }}>
           {client.name}
+          {client.nameAr && (
+            <span style={{ fontSize: "0.6em", color: "var(--ink-60)", marginLeft: 10, fontWeight: 400 }}>
+              {client.nameAr}
+            </span>
+          )}
         </h1>
 
-        {/* Tagline */}
-        <p style={{
-          fontSize:   "clamp(15px, 3vw, 18px)",
-          color:     "rgba(255,255,255,0.7)",
-          lineHeight:  1.6,
-          marginBottom: 28,
-          maxWidth:    420,
-          opacity:    loaded ? 1 : 0,
-          transform:  loaded ? "none" : "translateY(16px)",
-          transition: "opacity 0.6s var(--ease) 0.2s, transform 0.6s var(--ease) 0.2s",
-        }}>
-          {client.tagline}
-        </p>
+        {client.tagline && (
+          <p style={{
+            fontSize: 14,
+            color: "var(--ink-60)",
+            marginBottom: 14,
+            lineHeight: 1.5,
+          }}>
+            {client.tagline}
+          </p>
+        )}
 
-        {/* Trust badges */}
-        <div style={{
-          display:    "flex",
-          gap:         10,
-          flexWrap:   "wrap",
-          opacity:    loaded ? 1 : 0,
-          transform:  loaded ? "none" : "translateY(16px)",
-          transition: "opacity 0.6s var(--ease) 0.3s, transform 0.6s var(--ease) 0.3s",
-        }}>
+        {/* Trust Badges */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {[
             { icon: "⭐", text: `${client.rating} Rating` },
-            { icon: "🕐", text: client.deliveryTime },
-            { icon: "🚴", text: "Free Delivery" },
+            { icon: "🕐", text: client.hours },
+            { icon: "💬", text: "WhatsApp Order" },
           ].map(({ icon, text }) => (
             <div key={text} style={{
-              display:        "flex",
-              alignItems:     "center",
-              gap:             6,
-              background:    "rgba(255,255,255,0.12)",
-              backdropFilter: "blur(12px)",
-              border:        "1px solid rgba(255,255,255,0.16)",
-              borderRadius:  "var(--radius-pill)",
-              padding:       "7px 14px",
-              fontSize:       13,
-              fontWeight:     500,
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              background: "var(--cream-dark)",
+              borderRadius: 99,
+              padding: "5px 12px",
+              fontSize: 12,
+              fontWeight: 500,
+              color: "var(--ink-60)",
             }}>
-              <span style={{ fontSize: 14 }}>{icon}</span>
+              <span>{icon}</span>
               <span>{text}</span>
             </div>
           ))}
+
+          {/* Status Badge */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            background: client.isOpen !== false
+              ? "rgba(37,211,102,.1)"
+              : "rgba(239,68,68,.1)",
+            borderRadius: 99,
+            padding: "5px 12px",
+            fontSize: 12,
+            fontWeight: 700,
+            color: client.isOpen !== false ? "#25D366" : "#EF4444",
+          }}>
+            <span>{client.isOpen !== false ? "🟢" : "🔴"}</span>
+            <span>{client.isOpen !== false ? "Open Now" : "Closed"}</span>
+          </div>
         </div>
       </div>
     </section>

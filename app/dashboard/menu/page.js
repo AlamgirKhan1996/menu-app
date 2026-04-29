@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ImageUploader from "@/components/ImageUploader";
 
 const EMOJIS = ["🍔","🍕","🍣","🍗","🥗","🍜","🍝","🥩","🍱","🧆","🥙","🌮","🍛","🥘","🍲","🧋","☕","🥤","🍰","🍫","🍩","🍪","🥐","🫔","🧇","🥞","🍟","🌯","🥪","🍱"];
 
@@ -17,10 +18,13 @@ export default function MenuManagerPage() {
 
   // Forms
   const [itemForm, setItemForm] = useState({
-    name: "", nameAr: "", description: "",
-    price: "", categoryId: "", emoji: "🍔",
-    isAvailable: true, isFeatured: false,
-  });
+  name: "", nameAr: "",
+  description: "", descriptionAr: "",
+  price: "", categoryId: "",
+  image: null,      // ← main image URL
+  images: [],       // ← multiple images
+  isAvailable: true, isFeatured: false,
+});
   const [catForm, setCatForm] = useState({ name: "", nameAr: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -39,28 +43,32 @@ export default function MenuManagerPage() {
   }
 
   function resetItemForm() {
-    setItemForm({
-      name: "", nameAr: "", description: "",
-      price: "", categoryId: categories[0]?.id || "",
-      emoji: "🍔", isAvailable: true, isFeatured: false,
-    });
-    setError("");
-  }
+  setItemForm({
+    name: "", nameAr: "",
+    description: "", descriptionAr: "",
+    price: "", categoryId: categories[0]?.id || "",
+    image: null, images: [],
+    isAvailable: true, isFeatured: false,
+  });
+  setError("");
+}
 
   function openEdit(item) {
-    setItemForm({
-      name: item.name,
-      nameAr: item.nameAr || "",
-      description: item.description || "",
-      price: item.price.toString(),
-      categoryId: item.categoryId,
-      emoji: item.image || "🍔",
-      isAvailable: item.isAvailable,
-      isFeatured: item.isFeatured,
-    });
-    setEditingItem(item);
-    setShowAddItem(true);
-  }
+  setItemForm({
+    name: item.name,
+    nameAr: item.nameAr || "",
+    description: item.description || "",
+    descriptionAr: item.descriptionAr || "",
+    price: item.price.toString(),
+    categoryId: item.categoryId,
+    image: item.image || null,
+    images: item.images || [],
+    isAvailable: item.isAvailable,
+    isFeatured: item.isFeatured,
+  });
+  setEditingItem(item);
+  setShowAddItem(true);
+}
 
   async function saveItem() {
     if (!itemForm.name || !itemForm.price || !itemForm.categoryId) {
@@ -302,17 +310,49 @@ export default function MenuManagerPage() {
                       padding: "14px 16px",
                       opacity: item.isAvailable ? 1 : 0.5,
                     }}>
-                      {/* Emoji */}
-                      <div style={{
-                        width: 48, height: 48,
-                        background: "rgba(255,255,255,.06)",
-                        borderRadius: 10,
-                        display: "flex", alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 26, flexShrink: 0,
-                      }}>
-                        {item.image || "🍔"}
-                      </div>
+                      {/* Image Upload */}
+<div style={{ marginBottom: 16 }}>
+  <ImageUploader
+    label="Item Photos"
+    hint={`Upload up to 4 photos. First photo is the main image.`}
+    multiple={true}
+    maxImages={4}
+    currentImages={itemForm.images}
+    onImagesChange={(urls) => setItemForm(p => ({
+      ...p,
+      images: urls,
+      image: urls[0] || null,
+    }))}
+    folder="menu"
+  />
+</div>
+
+{/* Fallback Emoji if no image */}
+{itemForm.images.length === 0 && (
+  <div style={{ marginBottom: 16 }}>
+    <label style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.6)", display: "block", marginBottom: 8 }}>
+      Or choose an icon (if no photo)
+    </label>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+      {EMOJIS.map((e) => (
+        <button key={e} onClick={() => setItemForm(p => ({ ...p, image: e }))}
+          style={{
+            width: 38, height: 38,
+            borderRadius: 8,
+            border: itemForm.image === e
+              ? "2px solid #25D366"
+              : "1px solid rgba(255,255,255,.1)",
+            background: itemForm.image === e
+              ? "rgba(37,211,102,.15)"
+              : "rgba(255,255,255,.04)",
+            fontSize: 20, cursor: "pointer",
+          }}>
+          {e}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
                       {/* Info */}
                       <div style={{ flex: 1 }}>

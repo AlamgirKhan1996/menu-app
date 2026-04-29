@@ -21,7 +21,11 @@ export async function POST(request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { name, nameAr, description, price, categoryId, emoji, isAvailable, isFeatured } = body;
+  const {
+    name, nameAr, description, descriptionAr,
+    price, categoryId, image, images,
+    isAvailable, isFeatured,
+  } = body;
 
   if (!name || !price || !categoryId) {
     return NextResponse.json({ error: "Name, price and category required" }, { status: 400 });
@@ -36,8 +40,10 @@ export async function POST(request) {
       name,
       nameAr: nameAr || null,
       description: description || null,
+      descriptionAr: descriptionAr || null,
       price: parseFloat(price),
-      image: emoji || null,
+      image: image || null,
+      images: images || [],
       isAvailable: isAvailable ?? true,
       isFeatured: isFeatured ?? false,
       order: count,

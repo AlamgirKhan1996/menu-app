@@ -44,45 +44,69 @@ export default function MenuCard({ item, qty, onAdd, onRemove, accentColor, inde
         e.currentTarget.style.boxShadow = "var(--shadow-card)";
       }}
     >
-      {/* Food visual area */}
-      <div style={{
-        height:         120,
-        background:     cardGradient,
-        display:       "flex",
-        alignItems:    "center",
-        justifyContent: "center",
-        fontSize:       56,
-        position:      "relative",
-        userSelect:    "none",
-      }}>
-        <span style={{
-          filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.12))",
-          animation: `float ${3 + (index % 3) * 0.5}s ease-in-out ${index * 0.2}s infinite`,
-        }}>
-          {item.emoji}
-        </span>
 
-        {/* Badges top-right */}
-        <div style={{
-          position:   "absolute",
-          top:         10,
-          right:       10,
-          display:    "flex",
-          flexDirection: "column",
-          gap:         4,
-          alignItems: "flex-end",
-        }}>
-          {item.popular && (
-            <span style={{
-              background:   "#FF6B35",
-              color:        "#fff",
-              fontSize:      10,
-              fontWeight:    700,
-              padding:      "3px 8px",
-              borderRadius: "var(--radius-pill)",
-              letterSpacing: "0.05em",
-            }}>🔥 POPULAR</span>
-          )}
+      {/* Food visual area */}
+<div style={{
+  height: 180,
+  background: item.image && item.image.startsWith("http")
+    ? `url(${item.image}) center/cover no-repeat`
+    : cardGradient,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: 56,
+  position: "relative",
+  userSelect: "none",
+  overflow: "hidden",
+}}>
+  {/* Show emoji only if no real image */}
+  {(!item.image || !item.image.startsWith("http")) && (
+    <span style={{
+      filter: "drop-shadow(0 8px 16px rgba(0,0,0,.12))",
+      animation: `float ${3 + (index % 3) * 0.5}s ease-in-out ${index * 0.2}s infinite`,
+    }}>
+      {item.emoji || item.image || "🍔"}
+    </span>
+  )}
+
+  {/* Multiple images indicator */}
+  {item.images && item.images.length > 1 && (
+    <div style={{
+      position: "absolute",
+      bottom: 8, right: 8,
+      background: "rgba(0,0,0,.6)",
+      borderRadius: 99,
+      padding: "3px 8px",
+      fontSize: 10,
+      fontWeight: 700,
+      color: "#fff",
+    }}>
+      📸 {item.images.length}
+    </div>
+  )}
+
+  {/* Badges */}
+  <div style={{
+    position: "absolute",
+    top: 10, right: 10,
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+    alignItems: "flex-end",
+  }}>
+    {item.popular && (
+      <span style={{
+        background: "#FF6B35",
+        color: "#fff",
+        fontSize: 10,
+        fontWeight: 700,
+        padding: "3px 8px",
+        borderRadius: "var(--radius-pill)",
+        letterSpacing: ".05em",
+      }}>🔥 POPULAR</span>
+    )}
+  </div>
+</div>
           {item.new && (
             <span style={{
               background:   "#25D366",
@@ -105,8 +129,6 @@ export default function MenuCard({ item, qty, onAdd, onRemove, accentColor, inde
               letterSpacing: "0.05em",
             }}>🌶️ SPICY</span>
           )}
-        </div>
-      </div>
 
       {/* Content */}
       <div style={{ padding: "14px 16px 16px", flex: 1, display: "flex", flexDirection: "column" }}>

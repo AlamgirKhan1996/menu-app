@@ -22,11 +22,12 @@ export async function PATCH(request) {
   const body = await request.json();
   const {
     name, nameAr, whatsapp, city,
-    isOpen, greetingMessage, awayMessage,
+    isOpen, logo, coverImage, accentColor,
+    tagline, taglineAr,
+    greetingMessage, awayMessage,
     openTime, closeTime,
   } = body;
 
-  // Update restaurant
   await prisma.restaurant.update({
     where: { id: session.user.restaurantId },
     data: {
@@ -35,10 +36,14 @@ export async function PATCH(request) {
       whatsapp: whatsapp || undefined,
       city: city || undefined,
       isOpen: isOpen !== undefined ? isOpen : undefined,
+      logo: logo !== undefined ? logo : undefined,
+      coverImage: coverImage !== undefined ? coverImage : undefined,
+      accentColor: accentColor || undefined,
+      tagline: tagline || undefined,
+      taglineAr: taglineAr || undefined,
     },
   });
 
-  // Upsert settings
   await prisma.settings.upsert({
     where: { restaurantId: session.user.restaurantId },
     update: {

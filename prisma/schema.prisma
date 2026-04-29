@@ -12,32 +12,35 @@ datasource db {
 
 // ─── RESTAURANT (the main entity - each client is one restaurant) ─────────────
 model Restaurant {
-  id          String   @id @default(cuid())
-  name        String                        // "Smash Kitchen"
-  nameAr      String?                       // "مطبخ سماش"
-  slug        String   @unique              // "smash-kitchen" → /menu/smash-kitchen
-  whatsapp    String                        // "966501234567"
-  logo        String?                       // Cloudinary URL
-  coverImage  String?                       // Banner image
-  description String?
+  id            String    @id @default(cuid())
+  name          String // "Smash Kitchen"
+  nameAr        String? // "مطبخ سماش"
+  slug          String    @unique // "smash-kitchen" → /menu/smash-kitchen
+  whatsapp      String // "966501234567"
+  logo          String? // Cloudinary URL
+  coverImage    String? // Banner image
+  accentColor   String? // Brand color
+  tagline       String? // "Best burgers in town!"
+  taglineAr     String? // "أفضل برجر في المدينة!"
+  description   String?
   descriptionAr String?
-  address     String?
-  city        String?                       // "Madinah"
-  plan        Plan     @default(FREE)
-  planExpiry  DateTime?
-  isActive    Boolean  @default(true)
-  isOpen      Boolean  @default(true)      // Restaurant open/closed toggle
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  address       String?
+  city          String? // "Madinah"
+  plan          Plan      @default(FREE)
+  planExpiry    DateTime?
+  isActive      Boolean   @default(true)
+  isOpen        Boolean   @default(true) // Restaurant open/closed toggle
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
-  users       User[]
-  categories  Category[]
-  menuItems   MenuItem[]
-  orders      Order[]
-  customers   Customer[]
-  settings    Settings?
-  posts       SocialPost[]
+  users      User[]
+  categories Category[]
+  menuItems  MenuItem[]
+  orders     Order[]
+  customers  Customer[]
+  settings   Settings?
+  posts      SocialPost[]
 
   @@map("restaurants")
 }
@@ -46,7 +49,7 @@ model Restaurant {
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
-  password     String                        // bcrypt hashed
+  password     String // bcrypt hashed
   name         String?
   role         Role       @default(OWNER)
   isActive     Boolean    @default(true)
@@ -62,9 +65,9 @@ model User {
 // ─── CATEGORY (menu sections: "Burgers", "Drinks", "Desserts") ────────────────
 model Category {
   id           String     @id @default(cuid())
-  name         String                        // "Burgers"
-  nameAr       String?                       // "برجر"
-  order        Int        @default(0)        // display order
+  name         String // "Burgers"
+  nameAr       String? // "برجر"
+  order        Int        @default(0) // display order
   isActive     Boolean    @default(true)
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
@@ -77,23 +80,23 @@ model Category {
 
 // ─── MENU ITEM (individual dishes) ────────────────────────────────────────────
 model MenuItem {
-  id            String     @id @default(cuid())
-  name          String                        // "Smash Burger"
-  nameAr        String?                       // "برجر سماش"
+  id            String      @id @default(cuid())
+  name          String // "Smash Burger"
+  nameAr        String? // "برجر سماش"
   description   String?
   descriptionAr String?
-  price         Float                         // 45.00
-  image         String?                       // Cloudinary URL
-  isAvailable   Boolean    @default(true)     // toggle when sold out
-  isFeatured    Boolean    @default(false)    // show in hero section
-  order         Int        @default(0)        // display order
+  price         Float // 45.00
+  image         String? // Cloudinary URL
+  isAvailable   Boolean     @default(true) // toggle when sold out
+  isFeatured    Boolean     @default(false) // show in hero section
+  order         Int         @default(0) // display order
   categoryId    String
-  category      Category   @relation(fields: [categoryId], references: [id])
+  category      Category    @relation(fields: [categoryId], references: [id])
   restaurantId  String
-  restaurant    Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurant    Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   orderItems    OrderItem[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   @@index([restaurantId])
   @@index([categoryId])
@@ -103,12 +106,12 @@ model MenuItem {
 // ─── ORDER (every order that comes in) ────────────────────────────────────────
 model Order {
   id            String      @id @default(cuid())
-  orderNumber   String                          // "#1042" - readable for staff
+  orderNumber   String // "#1042" - readable for staff
   status        OrderStatus @default(NEW)
   total         Float
   customerName  String?
   customerPhone String?
-  note          String?                         // special requests
+  note          String? // special requests
   source        String      @default("whatsapp") // "whatsapp", "qr", "direct"
   restaurantId  String
   restaurant    Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
@@ -117,8 +120,8 @@ model Order {
   updatedAt     DateTime    @updatedAt
 
   // Link to customer if we find them
-  customerId    String?
-  customer      Customer?   @relation(fields: [customerId], references: [id])
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
 
   @@index([restaurantId])
   @@index([restaurantId, status])
@@ -128,14 +131,14 @@ model Order {
 
 // ─── ORDER ITEM (each dish in an order) ───────────────────────────────────────
 model OrderItem {
-  id           String    @id @default(cuid())
-  quantity     Int
-  price        Float                           // price AT TIME OF ORDER (never changes)
-  name         String                          // item name snapshot
-  menuItemId   String?
-  menuItem     MenuItem? @relation(fields: [menuItemId], references: [id])
-  orderId      String
-  order        Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id         String    @id @default(cuid())
+  quantity   Int
+  price      Float // price AT TIME OF ORDER (never changes)
+  name       String // item name snapshot
+  menuItemId String?
+  menuItem   MenuItem? @relation(fields: [menuItemId], references: [id])
+  orderId    String
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
   @@map("order_items")
@@ -143,69 +146,69 @@ model OrderItem {
 
 // ─── CUSTOMER (every person who has ordered) ──────────────────────────────────
 model Customer {
-  id           String     @id @default(cuid())
-  phone        String                          // "+966501234567"
-  name         String?
-  orderCount   Int        @default(0)
-  totalSpent   Float      @default(0)
-  lastOrderAt  DateTime?
-  loyaltyStamps Int       @default(0)          // for loyalty card feature
-  restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  orders       Order[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id            String     @id @default(cuid())
+  phone         String // "+966501234567"
+  name          String?
+  orderCount    Int        @default(0)
+  totalSpent    Float      @default(0)
+  lastOrderAt   DateTime?
+  loyaltyStamps Int        @default(0) // for loyalty card feature
+  restaurantId  String
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orders        Order[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
-  @@unique([phone, restaurantId])             // same phone = same customer PER restaurant
+  @@unique([phone, restaurantId]) // same phone = same customer PER restaurant
   @@index([restaurantId])
   @@map("customers")
 }
 
 // ─── SETTINGS (WhatsApp messages, Instagram token, hours) ─────────────────────
 model Settings {
-  id              String     @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // WhatsApp messages
-  greetingMessage String?    // auto-reply when customer messages
-  awayMessage     String?    // when restaurant is closed
-  
+  greetingMessage String? // auto-reply when customer messages
+  awayMessage     String? // when restaurant is closed
+
   // Business hours
-  openTime        String?    // "09:00"
-  closeTime       String?    // "23:00"
-  openDays        String[]   // ["Mon","Tue","Wed","Thu","Fri"]
-  
+  openTime  String? // "09:00"
+  closeTime String? // "23:00"
+  openDays  String[] // ["Mon","Tue","Wed","Thu","Fri"]
+
   // Instagram (for social posting feature)
-  igAccessToken   String?    // Instagram Graph API token
-  igAccountId     String?    // Instagram Business account ID
-  igTokenExpiry   DateTime?
-  
+  igAccessToken String? // Instagram Graph API token
+  igAccountId   String? // Instagram Business account ID
+  igTokenExpiry DateTime?
+
   // Notifications
-  soundAlert      Boolean    @default(true)
-  emailAlert      Boolean    @default(false)
-  alertEmail      String?
-  
-  restaurantId    String     @unique
-  restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  updatedAt       DateTime   @updatedAt
+  soundAlert Boolean @default(true)
+  emailAlert Boolean @default(false)
+  alertEmail String?
+
+  restaurantId String     @unique
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  updatedAt    DateTime   @updatedAt
 
   @@map("settings")
 }
 
 // ─── SOCIAL POST (Instagram posts created in the AI studio) ───────────────────
 model SocialPost {
-  id            String     @id @default(cuid())
-  imageUrl      String                          // Cloudinary URL
-  captionEn     String?                         // AI-generated English caption
-  captionAr     String?                         // AI-generated Arabic caption
-  hashtags      String[]
-  platform      String     @default("instagram")
-  status        PostStatus @default(DRAFT)
-  scheduledFor  DateTime?                       // when to publish
-  publishedAt   DateTime?
-  igPostId      String?                         // Instagram post ID after publishing
-  restaurantId  String
-  restaurant    Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  createdAt     DateTime   @default(now())
+  id           String     @id @default(cuid())
+  imageUrl     String // Cloudinary URL
+  captionEn    String? // AI-generated English caption
+  captionAr    String? // AI-generated Arabic caption
+  hashtags     String[]
+  platform     String     @default("instagram")
+  status       PostStatus @default(DRAFT)
+  scheduledFor DateTime? // when to publish
+  publishedAt  DateTime?
+  igPostId     String? // Instagram post ID after publishing
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
 
   @@index([restaurantId])
   @@index([status, scheduledFor])
@@ -214,30 +217,30 @@ model SocialPost {
 
 // ─── ENUMS ────────────────────────────────────────────────────────────────────
 enum Role {
-  OWNER    // full access
-  MANAGER  // all except billing
-  STAFF    // orders only, no menu editing
+  OWNER // full access
+  MANAGER // all except billing
+  STAFF // orders only, no menu editing
 }
 
 enum Plan {
-  FREE     // 30 orders/month
-  PRO      // SAR 299/month - unlimited + dashboard
-  GROWTH   // SAR 699/month - + Instagram AI
-  EMPIRE   // SAR 1499/month - + multi-branch
+  FREE // 30 orders/month
+  PRO // SAR 299/month - unlimited + dashboard
+  GROWTH // SAR 699/month - + Instagram AI
+  EMPIRE // SAR 1499/month - + multi-branch
 }
 
 enum OrderStatus {
-  NEW        // 🔴 just arrived
-  CONFIRMED  // ✅ staff confirmed
-  COOKING    // 🟡 being prepared
-  READY      // 🟢 ready for pickup/delivery
-  DONE       // ✅ completed
-  CANCELLED  // ❌ cancelled
+  NEW // 🔴 just arrived
+  CONFIRMED // ✅ staff confirmed
+  COOKING // 🟡 being prepared
+  READY // 🟢 ready for pickup/delivery
+  DONE // ✅ completed
+  CANCELLED // ❌ cancelled
 }
 
 enum PostStatus {
-  DRAFT      // not scheduled yet
-  SCHEDULED  // queued to publish
-  PUBLISHED  // live on Instagram
-  FAILED     // publishing failed
+  DRAFT // not scheduled yet
+  SCHEDULED // queued to publish
+  PUBLISHED // live on Instagram
+  FAILED // publishing failed
 }
