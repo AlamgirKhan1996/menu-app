@@ -1,0 +1,20 @@
+[33mdc5d307[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m feat: AI Menu Writer — Claude generates Arabic + English descriptions
+[33m87ecff8[m feat: AI Menu Writer — Claude generates Arabic + English descriptions
+[33m613a28f[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: image upload, restaurant branding, logo, banner, real menu photos
+[33m7489646[m fix: export saveOrderToDB from whatsapp utils
+[33m83e3e5e[m fix: add null safety for empty menu and categories
+[33mbc4d5c5[m feat: Settings page, order history, customer discovery, menu link sharing
+[33m917ee24[m fix: correct import path in CartDrawer
+[33m7d13074[m feat: Phase 1 complete - Orders, Live Board, QR Code, Dashboard Stats
+[33m3d242c4[m feat: Phase 1 - Menu Manager with full CRUD
+[33m439c57c[m force: redeploy to clear cache
+[33mb299820[m fix: update root redirect and nextauth url
+[33mf5e3c5f[m fix: wrap useSearchParams in Suspense boundary
+[33mfaee953[m fix: run prisma generate before build
+[33m28cd955[m fix: match eslint-config-next to next.js version
+[33m74d2c35[m fix: add npmrc for legacy peer deps
+[33m07f0deb[m feat: SaaS foundation - auth, signup, dashboard, prisma schema
+[33m7ade634[m feat: SaaS foundation - auth, signup, dashboard, prisma schema
+[33m27028a4[m update some ui
+[33m45cd42c[m update some ui
+[33meaac793[m initial commit
