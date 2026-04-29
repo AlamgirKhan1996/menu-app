@@ -80,3 +80,23 @@ export function getOrderTotal(items) {
 export function getItemCount(items) {
   return items.reduce((sum, item) => sum + item.qty, 0);
 }
+
+export async function saveOrderToDB({ restaurantSlug, items }) {
+  try {
+    await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        restaurantSlug,
+        items: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.qty,
+        })),
+      }),
+    });
+  } catch (e) {
+    console.error("Failed to save order:", e);
+  }
+}
