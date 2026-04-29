@@ -1,7 +1,7 @@
 "use client";
 
 import { formatOrderMessage, buildWhatsAppLink, getOrderTotal, getItemCount } from "@/utils/whatsapp";
-import { saveOrderToDB } from "@/utils/database";
+import { saveOrderToDB } from "@/utils/whatsapp";
 
 function CartItem({ item, onAdd, onRemove, onDelete, accentColor }) {
   return (
