@@ -23,7 +23,7 @@ export async function PUT(request, { params }) {
       descriptionAr: descriptionAr || null,
       price: parseFloat(price),
       image: image || null,
-      images: images || [],
+      // images: images || [],
       isAvailable,
       isFeatured,
       categoryId,
