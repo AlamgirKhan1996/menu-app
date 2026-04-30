@@ -87,6 +87,7 @@ model MenuItem {
   descriptionAr String?
   price         Float // 45.00
   image         String? // Cloudinary URL
+  images        String[]    @default([])
   isAvailable   Boolean     @default(true) // toggle when sold out
   isFeatured    Boolean     @default(false) // show in hero section
   order         Int         @default(0) // display order
