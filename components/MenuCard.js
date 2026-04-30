@@ -59,15 +59,38 @@ export default function MenuCard({ item, qty, onAdd, onRemove, accentColor, inde
   userSelect: "none",
   overflow: "hidden",
 }}>
-  {/* Show emoji only if no real image */}
-  {(!item.image || !item.image.startsWith("http")) && (
-    <span style={{
-      filter: "drop-shadow(0 8px 16px rgba(0,0,0,.12))",
-      animation: `float ${3 + (index % 3) * 0.5}s ease-in-out ${index * 0.2}s infinite`,
-    }}>
-      {item.emoji || item.image || "🍔"}
-    </span>
+  {/* Food Image */}
+<div style={{
+  width: 100,
+  height: 100,
+  borderRadius: 14,
+  overflow: "hidden",
+  flexShrink: 0,
+  background: "#f3f4f6",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: 40,
+}}>
+  {item.image && item.image.startsWith("http") ? (
+    <img
+      src={item.image}
+      alt={item.name}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+      }}
+      onError={(e) => {
+        // Fallback to emoji if image fails
+        e.target.style.display = "none";
+        e.target.parentNode.innerHTML = item.emoji || "🍔";
+      }}
+    />
+  ) : (
+    <span>{item.emoji || "🍔"}</span>
   )}
+</div>
 
   {/* Multiple images indicator */}
   {item.images && item.images.length > 1 && (

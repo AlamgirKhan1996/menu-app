@@ -51,7 +51,7 @@ export default async function ClientPage({ params }) {
     category: item.category?.name || "Other",
     emoji: item.image || "🍔",          // ← emoji fallback
     image: item.image,                  // ← real image URL
-    images: item.images || [],          // ← multiple images
+    images: item.images?.[0] || item.image || null,          // ← multiple images
     popular: item.isFeatured || false,
     spicy: false,
     new: false,

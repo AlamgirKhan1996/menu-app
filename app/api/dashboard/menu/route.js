@@ -12,8 +12,13 @@ export async function GET() {
     include: { category: true },
     orderBy: { order: "asc" },
   });
+  const itemsWithImages = items.map((item) => ({
+    ...item,
+    images: item.images || [],
+    image: item.image || null,
+  }));
 
-  return NextResponse.json(items);
+  return NextResponse.json(itemsWithImages);
 }
 
 export async function POST(request) {
