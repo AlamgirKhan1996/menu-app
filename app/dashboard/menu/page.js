@@ -10,6 +10,8 @@ export default function MenuManagerPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("items");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult] = useState(null);
 
   // Modals
   const [showAddItem, setShowAddItem] = useState(false);
@@ -100,6 +102,38 @@ export default function MenuManagerPage() {
     }
     setSaving(false);
   }
+
+  async function handleAIGenerate() {
+  if (!itemForm.name || aiLoading) return;
+  setAiLoading(true);
+  setAiResult(null);
+
+  try {
+    const res = await fetch("/api/dashboard/ai/menu-writer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        itemName: itemForm.name,
+        category: categories.find(c => c.id === itemForm.categoryId)?.name || "",
+        price: itemForm.price,
+      }),
+    });
+
+    const data = await res.json();
+    if (data.descriptionEn) {
+      setAiResult(data);
+      setItemForm(p => ({
+        ...p,
+        description: p.description || data.descriptionEn,
+        descriptionAr: p.descriptionAr || data.descriptionAr,
+      }));
+    }
+  } catch (err) {
+    console.error("AI error:", err);
+  } finally {
+    setAiLoading(false);
+  }
+}
 
   async function deleteItem(id) {
     if (!confirm("Delete this item?")) return;
@@ -575,6 +609,89 @@ export default function MenuManagerPage() {
                 onChange={e => setItemForm(p => ({ ...p, nameAr: e.target.value }))}
               />
             </div>
+
+            {/* AI Menu Writer */}
+<div style={{
+  background: "linear-gradient(135deg, rgba(139,92,246,.12), rgba(37,211,102,.08))",
+  border: "1px solid rgba(139,92,246,.25)",
+  borderRadius: 12,
+  padding: "14px 16px",
+  marginBottom: 16,
+}}>
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <span style={{ fontSize: 18 }}>✨</span>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>AI Menu Writer</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>
+          Auto-generate Arabic + English descriptions
+        </div>
+      </div>
+    </div>
+    <button
+      onClick={handleAIGenerate}
+      disabled={!itemForm.name || aiLoading}
+      style={{
+        padding: "8px 18px",
+        background: !itemForm.name || aiLoading
+          ? "rgba(255,255,255,.06)"
+          : "linear-gradient(135deg, #8B5CF6, #25D366)",
+        border: "none",
+        borderRadius: 20,
+        color: !itemForm.name || aiLoading ? "rgba(255,255,255,.3)" : "#fff",
+        fontSize: 12,
+        fontWeight: 700,
+        cursor: !itemForm.name || aiLoading ? "not-allowed" : "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        transition: "all .2s",
+        fontFamily: "inherit",
+      }}
+    >
+      {aiLoading ? (
+        <>
+          <span style={{
+            width: 12, height: 12,
+            border: "2px solid rgba(255,255,255,.3)",
+            borderTopColor: "#fff",
+            borderRadius: "50%",
+            display: "inline-block",
+            animation: "spin 0.8s linear infinite",
+          }} />
+          Writing...
+        </>
+      ) : "🤖 Generate"}
+    </button>
+  </div>
+
+  {aiResult && (
+    <div style={{
+      background: "rgba(0,0,0,.2)",
+      borderRadius: 8,
+      padding: "10px 12px",
+      fontSize: 12,
+      color: "rgba(255,255,255,.7)",
+      lineHeight: 1.6,
+      borderLeft: "3px solid #8B5CF6",
+    }}>
+      <div style={{ marginBottom: 6 }}>
+        <span style={{ color: "#25D366", fontWeight: 700 }}>EN: </span>
+        {aiResult.descriptionEn}
+      </div>
+      <div style={{ direction: "rtl", textAlign: "right" }}>
+        <span style={{ color: "#8B5CF6", fontWeight: 700 }}>AR: </span>
+        {aiResult.descriptionAr}
+      </div>
+    </div>
+  )}
+
+  {!itemForm.name && (
+    <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", textAlign: "center" }}>
+      👆 Enter item name above to enable AI generation
+    </div>
+  )}
+</div>
 
             {/* Description */}
             <div style={{ marginBottom: 14 }}>
