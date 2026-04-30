@@ -43,7 +43,7 @@ export async function POST(request) {
       descriptionAr: descriptionAr || null,
       price: parseFloat(price),
       image: image || null,
-      // images: images || [],
+      images: images || [],
       isAvailable: isAvailable ?? true,
       isFeatured: isFeatured ?? false,
       order: count,

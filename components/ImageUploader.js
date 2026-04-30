@@ -34,6 +34,35 @@ export default function ImageUploader({
     return data.url;
   }
 
+  async function handleRemoveImage(url, index) {
+  // Extract publicId from Cloudinary URL
+  // URL looks like: https://res.cloudinary.com/cloud/image/upload/v123/orderflow/slug/menu/abc123.jpg
+  try {
+    const urlParts = url.split("/");
+    const uploadIndex = urlParts.indexOf("upload");
+    // Remove version (v123) and join the rest
+    const publicId = urlParts
+      .slice(uploadIndex + 2)
+      .join("/")
+      .replace(/\.[^/.]+$/, ""); // remove extension
+
+    await fetch("/api/upload/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ publicId }),
+    });
+  } catch (e) {
+    console.error("Cloudinary delete error:", e);
+    // Still remove from UI even if Cloudinary delete fails
+  }
+
+  // Remove from UI array
+  onImagesChange?.(currentImages.filter((_, idx) => idx !== index));
+}
+
+  
+  
+
   async function handleFiles(files) {
     if (!files || files.length === 0) return;
     setUploading(true);
@@ -234,22 +263,21 @@ export default function ImageUploader({
 
       {value && (
         <button
-          onClick={() => onChange?.(null)}
-          style={{
-            marginTop: 8,
-            padding: "4px 12px",
-            background: "rgba(239,68,68,.1)",
-            border: "1px solid rgba(239,68,68,.2)",
-            borderRadius: 6,
-            color: "#EF4444",
-            fontSize: 11,
-            fontWeight: 600,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          Remove image
-        </button>
+  onClick={() => handleRemoveImage(url, i)} // ← Update this line
+  style={{
+    position: "absolute", top: 4, right: 4,
+    width: 24, height: 24,
+    borderRadius: "50%",
+    background: "rgba(0,0,0,.7)",
+    border: "none",
+    color: "#fff",
+    fontSize: 12,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>✕</button>
       )}
 
       <input
