@@ -2,11 +2,13 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
   const [orders, setOrders] = useState([]);
+  const router = useRouter();
   const [menuCount, setMenuCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -24,6 +26,18 @@ export default function DashboardPage() {
     }
     fetchStats();
   }, []);
+  useEffect(() => {
+  async function checkOnboarding() {
+    const res = await fetch("/api/dashboard/settings");
+    const data = await res.json();
+    // If no logo and no cover, they're new — send to onboarding
+    if (!data.logo && !data.coverImage && !data.onboardingComplete) {
+      router.push("/dashboard/onboarding");
+    }
+  }
+  checkOnboarding();
+}, []);
+
 
   const newOrders = orders.filter(o => o.status === "NEW").length;
   const todayRevenue = orders.reduce((sum, o) => sum + o.total, 0);
