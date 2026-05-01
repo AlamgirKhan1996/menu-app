@@ -8,7 +8,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [lastCount, setLastCount] = useState(null);
   const [newOrderFlash, setNewOrderFlash] = useState(false);
-  const { playAlert } = useOrderSound();
+  // const { playAlert } = useOrderSound();
   const isFirstLoad = useRef(true);
 
   const fetchOrders = useCallback(async () => {
