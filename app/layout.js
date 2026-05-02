@@ -1,4 +1,5 @@
 import "./globals.css";
+import { AuthProvider } from "@/components/Providers";
 
 export const metadata = {
   title: "Menu — Order via WhatsApp",
@@ -8,7 +9,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }
