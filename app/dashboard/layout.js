@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Providers from "./providers";
 import Sidebar from "./components/Sidebar";
+import TrialBanner from "@/components/TrialBanner";
 
 export default async function DashboardLayout({ children }) {
   const session = await getServerSession(authOptions);
@@ -13,6 +14,7 @@ export default async function DashboardLayout({ children }) {
       <div style={{ display: "flex", minHeight: "100vh", background: "#0A0C0E" }}>
         <Sidebar restaurant={session.user} />
         <main style={{ flex: 1, overflowY: "auto" }}>
+          <TrialBanner />
           {children}
         </main>
       </div>

@@ -42,6 +42,14 @@ model Restaurant {
   settings   Settings?
   posts      SocialPost[]
 
+  // 🆕 Trial + Billing fields
+  trialEndsAt    DateTime?
+  isTrialExpired Boolean   @default(false)
+  isPaid         Boolean   @default(false)
+  paidAt         DateTime?
+  paidUntil      DateTime?
+  activatedBy    String? // your user ID — who activated them
+
   @@map("restaurants")
 }
 
@@ -221,6 +229,7 @@ enum Role {
   OWNER // full access
   MANAGER // all except billing
   STAFF // orders only, no menu editing
+  SUPER_ADMIN // 🆕 Only you
 }
 
 enum Plan {
