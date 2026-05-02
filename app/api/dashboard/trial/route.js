@@ -21,12 +21,12 @@ export async function GET() {
   const now = new Date();
 
   // Paid and active
-  if (restaurant.isPaid && restaurant.paidUntil > now) {
+  if (restaurant?.isPaid && restaurant.paidUntil > now) {
     return NextResponse.json({ status: "PAID", daysLeft: null });
   }
 
   // On trial
-  if (restaurant.trialEndsAt && restaurant.trialEndsAt > now) {
+  if (restaurant?.trialEndsAt && restaurant.trialEndsAt > now) {
     const daysLeft = Math.ceil((restaurant.trialEndsAt - now) / (1000 * 60 * 60 * 24));
     return NextResponse.json({ status: "TRIAL", daysLeft });
   }
