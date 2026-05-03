@@ -14,8 +14,8 @@ export default function MenuSection({ client, cart, onAdd, onRemove }) {
   const menuItems = client.menu || [];
   const filtered = menuItems.filter((item) => {
     const matchCat  = activeCategory === "All" || item.category === activeCategory;
-    const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        item.desc.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch = (item.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (item.desc || "").toLowerCase().includes(searchQuery.toLowerCase());
     return matchCat && matchSearch;
   });
 
