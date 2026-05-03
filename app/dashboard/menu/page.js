@@ -383,7 +383,11 @@ export default function MenuPage() {
                           }}
                         >✏️</button>
                         <button
-                          onClick={() => handleDelete(item.id)}
+                          onClick={async () => {
+                            if (!confirm("Delete this item?")) return;
+                            await fetch(`/api/dashboard/categories`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: cat.id }) });
+                            await fetchAll();
+                          }}
                           style={{
                             width: 32, height: 32, borderRadius: 8,
                             background: "rgba(239,68,68,.7)",
