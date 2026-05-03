@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import HeroSection from "./HeroSection";
-import MenuSection from "./MenuSection";
 import CartDrawer from "@/components/CartDrawer";
-import StickyOrderBar from "@/components/StickyOrderBar";
 
 export default function RestaurantPage({ client }) {
   const [cart, setCart] = useState([]);
@@ -34,7 +32,7 @@ export default function RestaurantPage({ client }) {
   }
 
   const totalItems = cart.reduce((s, i) => s + i.qty, 0);
-  const categories = ["All", ...new Set(client.menu.map(item => item.category))];
+  const categories = client.categories?.length > 0 ? client.categories : ["All"];
   const filteredMenu = activeCategory === "All"
     ? client.menu
     : client.menu.filter(i => i.category === activeCategory);
