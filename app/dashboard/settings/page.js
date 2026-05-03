@@ -8,6 +8,8 @@ export default function SettingsPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [form, setForm] = useState({
@@ -55,19 +57,44 @@ export default function SettingsPage() {
   }
 
   async function handleSave() {
-    setSaving(true);
+  setSaving(true);
+  setSuccess("");
+  setError("");
+  try {
     const res = await fetch("/api/dashboard/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        // Profile
+        name: form.name,
+        nameAr: form.nameAr,
+        whatsapp: form.whatsapp,
+        city: form.city,
+        isOpen: form.isOpen,
+        // Branding — make sure ALL these are included
+        logo: form.logo,
+        coverImage: form.coverImage,
+        accentColor: form.accentColor,
+        tagline: form.tagline,
+        taglineAr: form.taglineAr,
+        // WhatsApp messages
+        greetingMessage: form.greetingMessage,
+        awayMessage: form.awayMessage,
+        // Hours
+        openTime: form.openTime,
+        closeTime: form.closeTime,
+      }),
     });
-
-    if (res.ok) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    }
+    const data = await res.json();
+    if (!res.ok) { setError(data.error || "Save failed"); return; }
+    setSuccess("Saved successfully! ✅");
+    setTimeout(() => setSuccess(""), 3000);
+  } catch (err) {
+    setError("Network error — try again");
+  } finally {
     setSaving(false);
   }
+}
 
   const inp = {
     width: "100%",
@@ -327,6 +354,48 @@ export default function SettingsPage() {
           />
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Custom</span>
         </div>
+
+        {/* Save Button — inside branding tab */}
+{error && (
+  <div style={{
+    background: "rgba(239,68,68,.1)",
+    border: "1px solid rgba(239,68,68,.2)",
+    borderRadius: 10, padding: "10px 14px",
+    color: "#EF4444", fontSize: 13,
+  }}>
+    {error}
+  </div>
+)}
+
+{success && (
+  <div style={{
+    background: "rgba(37,211,102,.1)",
+    border: "1px solid rgba(37,211,102,.2)",
+    borderRadius: 10, padding: "10px 14px",
+    color: "#25D366", fontSize: 13, fontWeight: 700,
+  }}>
+    {success}
+  </div>
+)}
+
+<button
+  onClick={handleSave}
+  disabled={saving}
+  style={{
+    width: "100%", padding: "14px",
+    background: saving
+      ? "rgba(255,255,255,.06)"
+      : "linear-gradient(135deg, #25D366, #128C7E)",
+    border: "none", borderRadius: 12,
+    color: saving ? "rgba(255,255,255,.3)" : "#fff",
+    fontSize: 15, fontWeight: 800,
+    cursor: saving ? "not-allowed" : "pointer",
+    fontFamily: "inherit",
+  }}
+>
+  {saving ? "Saving..." : "💾 Save Branding"}
+</button>
+
       </div>
     </div>
   </div>
