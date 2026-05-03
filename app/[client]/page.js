@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import RestaurantPage from "@/sections/RestaurantPage";
+import { images } from "@/next.config";
 
 export default async function ClientPage({ params }) {
   const restaurant = await prisma.restaurant.findUnique({
@@ -52,6 +53,7 @@ export default async function ClientPage({ params }) {
     emoji: item.image || "🍔",          // ← emoji fallback
     image: item.image,                  // ← real image URL
     images: item.images?.[0] || item.image || null,          // ← multiple images
+    images: item.images || [],
     popular: item.isFeatured || false,
     spicy: false,
     new: false,

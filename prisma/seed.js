@@ -49,6 +49,7 @@ async function main() {
             name: "Shawarma",
             nameAr: "شاورما",
             order: 0,
+            isActive: true,
             menuItems: {
               create: [
                 {
@@ -78,6 +79,7 @@ async function main() {
             name: "Grills",
             nameAr: "مشاوي",
             order: 1,
+            isActive: true,
             menuItems: {
               create: [
                 {
@@ -107,6 +109,7 @@ async function main() {
             name: "Sides & Drinks",
             nameAr: "المقبلات والمشروبات",
             order: 2,
+            isActive: true,
             menuItems: {
               create: [
                 {
