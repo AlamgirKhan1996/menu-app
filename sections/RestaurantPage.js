@@ -32,7 +32,7 @@ export default function RestaurantPage({ client }) {
   }
 
   const totalItems = cart.reduce((s, i) => s + i.qty, 0);
-  const categories = client.categories?.length > 0 ? client.categories : ["All"];
+  const categories = client.categories || ["All"];
   const filteredMenu = activeCategory === "All"
     ? client.menu
     : client.menu.filter(i => i.category === activeCategory);
