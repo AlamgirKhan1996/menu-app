@@ -18,8 +18,8 @@ export default async function ClientPage({ params }) {
       menuItems: {
         where: { 
           OR:[
-            { isActive: true},
-            { isActive: null}
+            { isAvailable: true},
+            { isAvailable: null}
           ]
         },
         orderBy: { order: "asc" },
