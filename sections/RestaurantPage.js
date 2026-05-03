@@ -307,7 +307,7 @@ export default function RestaurantPage({ client }) {
         isOpen={cartOpen}
         onClose={() => setCartOpen(false)}
         cart={cart}
-        restaurant={client}
+        client={client}
         onAdd={addToCart}
         onRemove={removeFromCart}
         accentColor={client.accentColor}
