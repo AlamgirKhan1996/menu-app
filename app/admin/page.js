@@ -32,13 +32,13 @@ if (status === "loading") return (
 );
 
 // Don't render if not super admin
+useEffect(() => {
+  fetch("/api/admin/restaurants")
+    .then(r => r.json())
+    .then(data => { setRestaurants(data); setLoading(false); });
+}, []);
 if (session?.user?.role !== "SUPER_ADMIN") return null;
 
-  useEffect(() => {
-    fetch("/api/admin/restaurants")
-      .then(r => r.json())
-      .then(data => { setRestaurants(data); setLoading(false); });
-  }, []);
 
   async function toggleActive(id, current) {
     await fetch("/api/admin/restaurants", {
