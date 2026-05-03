@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import  {useOrderSound } from "@/components/OrderSound";
+import  {useOrderSounds } from "@/components/OrderSounds";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastCount, setLastCount] = useState(null);
   const [newOrderFlash, setNewOrderFlash] = useState(false);
-  const { playAlert } = useOrderSound();
+  const { playAlert } = useOrderSounds();
   const isFirstLoad = useRef(true);
 
   const fetchOrders = useCallback(async () => {
