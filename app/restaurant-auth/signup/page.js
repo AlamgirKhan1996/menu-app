@@ -10,7 +10,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
-    restaurantName: "",
+    name: "",
     whatsapp: "",
     email: "",
     password: "",
@@ -141,9 +141,9 @@ export default function SignupPage() {
             </label>
             <input
               type="text"
-              name="restaurantName"
+              name="name"
               placeholder="e.g. Smash Kitchen"
-              value={form.restaurantName}
+              value={form.name}
               onChange={handleChange}
               required
               style={inputStyle}
