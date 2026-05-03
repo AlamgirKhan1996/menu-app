@@ -7,11 +7,21 @@ export default async function ClientPage({ params }) {
     where: { slug: params.client },
     include: {
       categories: {
-        where: { isActive: true },
-        orderBy: { order: "asc" },
+      where: {
+        OR:[
+          { isActive: true},
+          { isActive: null}
+        ]
+      },
+      orderBy: { order: "asc" },
       },
       menuItems: {
-        where: { isAvailable: true },
+        where: { 
+          OR:[
+            { isActive: true},
+            { isActive: null}
+          ]
+        },
         orderBy: { order: "asc" },
         include: { category: true },
       },
