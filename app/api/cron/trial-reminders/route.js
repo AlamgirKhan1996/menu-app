@@ -39,3 +39,4 @@ export async function GET(request) {
     success: true,
     reminders: urgentReminders.length,
   });
+}
