@@ -13,9 +13,26 @@ export default function AdminPanel() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/restaurant-auth/signin");
-    if (session?.user?.role !== "SUPER_ADMIN") router.push("/dashboard");
-  }, [session, status]);
+  if (status === "loading") return; // ← Wait for session to load
+  if (status === "unauthenticated") {
+    router.push("/restaurant-auth/signin");
+    return;
+  }
+  if (session?.user?.role !== "SUPER_ADMIN") {
+    router.push("/dashboard");
+    return;
+  }
+}, [session, status, router]);
+
+// Show loading while session loads
+if (status === "loading") return (
+  <div style={{ minHeight: "100vh", background: "#0a0a0f", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+    Loading...
+  </div>
+);
+
+// Don't render if not super admin
+if (session?.user?.role !== "SUPER_ADMIN") return null;
 
   useEffect(() => {
     fetch("/api/admin/restaurants")
