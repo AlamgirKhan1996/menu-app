@@ -39,12 +39,20 @@ export default function RestaurantPage({ client }) {
 
   return (
     <div style={{
+    minHeight: "100vh",
+    background: "#f0f0f0", // ← grey background on desktop
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+  }}>
+    <div style={{
+      width: "100%",
+      maxWidth: 480,
       minHeight: "100vh",
       background: "#fff",
-      maxWidth: 480,
-      margin: "0 auto",
       position: "relative",
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      boxShadow: "0 0 40px rgba(0,0,0,.15)", // ← looks like phone on desktop
     }}>
       {/* Hero */}
       <HeroSection client={client} />
@@ -317,5 +325,6 @@ export default function RestaurantPage({ client }) {
       />
       )}
     </div>
-  );
+  </div>
+);
 }
