@@ -100,7 +100,7 @@ export default function ImageUploader({
 
   if (multiple) {
     return (
-      <div>
+      <div onClick={() => !uploading && inputRef.current?.click()}>
         {label && (
           <label style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.6)", display: "block", marginBottom: 8 }}>
             {label}
@@ -263,8 +263,9 @@ export default function ImageUploader({
 
       {value && (
         <button
-  onClick={() => handleRemoveImage(url, i)} // ← Update this line
+  onClick={() => onChange?.(null)} // ← Update this line
   style={{
+    marginTop: 8,
     position: "absolute", top: 4, right: 4,
     width: 24, height: 24,
     borderRadius: "50%",
@@ -277,7 +278,7 @@ export default function ImageUploader({
     alignItems: "center",
     justifyContent: "center",
   }}
->✕</button>
+>🗑 Remove & Change Photo</button>
       )}
 
       <input
