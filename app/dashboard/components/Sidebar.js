@@ -94,6 +94,30 @@ export default function Sidebar({ restaurant }) {
         })}
       </nav>
 
+      {/* Upgrade CTA — bottom of sidebar */}
+<div style={{ marginTop: "auto", padding: "16px" }}>
+  <a
+    href="/dashboard/upgrade"
+    style={{
+      display: "block",
+      padding: "12px 16px",
+      background: "linear-gradient(135deg, rgba(37,211,102,.15), rgba(139,92,246,.15))",
+      border: "1px solid rgba(37,211,102,.2)",
+      borderRadius: 12,
+      textDecoration: "none",
+      textAlign: "center",
+    }}
+  >
+    <div style={{ fontSize: 16, marginBottom: 4 }}>⚡</div>
+    <div style={{ fontSize: 12, fontWeight: 800, color: "#25D366" }}>
+      Upgrade Plan
+    </div>
+    <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginTop: 2 }}>
+      Start from SAR 99/month
+    </div>
+  </a>
+</div>
+
       {/* Sign Out */}
       <div style={{ padding: "16px 12px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
         <button
