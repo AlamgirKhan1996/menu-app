@@ -8,6 +8,7 @@ const links = [
   { href: "/dashboard", icon: "🏠", label: "Home" },
   { href: "/dashboard/menu", icon: "🍔", label: "Menu Manager" },
   { href: "/dashboard/orders", icon: "📋", label: "Live Orders" },
+  { href: "/dashboard/analytics", icon: "📊", label: "Analytics" },
   { href: "/dashboard/qr", icon: "📱", label: "QR Code" },
   { href: "/dashboard/settings", icon: "⚙️", label: "Settings" },
 ];
