@@ -126,7 +126,7 @@ export default function MenuPage() {
 
   async function handleDelete(id) {
     if (!confirm("Delete this item?")) return;
-    await fetch(`/api/dashboard/menu/${id}`, { method: "DELETE" });
+    await fetch(`/api/dashboard/categories`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     await fetchAll();
   }
 

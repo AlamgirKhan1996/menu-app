@@ -59,12 +59,27 @@ export default async function ClientPage({ params }) {
     return <RestaurantPage client={client} />;
 
   } catch (error) {
-    console.error("❌ Client page error:", error);
-    return (
-      <div style={{ padding: 40, color: "red", fontFamily: "monospace" }}>
-        <h2>Error loading restaurant</h2>
-        <pre>{error.message}</pre>
-      </div>
-    );
-  }
+  console.error("❌ Client page error:", error);
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#fff",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 32,
+      textAlign: "center",
+      fontFamily: "-apple-system, sans-serif",
+    }}>
+      <div style={{ fontSize: 64, marginBottom: 16 }}>🍽️</div>
+      <h1 style={{ fontSize: 22, fontWeight: 800, color: "#111", marginBottom: 8 }}>
+        Restaurant not found
+      </h1>
+      <p style={{ fontSize: 14, color: "#6b7280", maxWidth: 300, lineHeight: 1.6 }}>
+        This menu link doesn't exist yet. Please check the URL or contact the restaurant.
+      </p>
+    </div>
+  );
+}
 }

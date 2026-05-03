@@ -21,7 +21,8 @@ export async function POST(request) {
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, "")
       .replace(/\s+/g, "-")
-      .slice(0, 30);
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 30) || `restaurant-${Date.now()}`;
 
     // Make slug unique
     let slug = baseSlug;
