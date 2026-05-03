@@ -52,7 +52,6 @@ export default async function ClientPage({ params }) {
       price: item.price || 0,
       category: item.category?.name || "Other",
       emoji: item.image || "🍔",
-      image: item.images?.[0] || item.image || null,  // ← single main image
       images: item.images || [],                        // ← full array
       popular: item.isFeatured || false,
       spicy: false,
