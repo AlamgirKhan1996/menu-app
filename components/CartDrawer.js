@@ -13,19 +13,28 @@ function CartItem({ item, onAdd, onRemove, onDelete, accentColor }) {
       animation:      "fadeUp 0.3s var(--ease)",
     }}>
       {/* Emoji avatar */}
-      <div style={{
-        width:          46,
-        height:         46,
-        borderRadius:  "var(--radius-md)",
-        background:    "var(--cream-dark)",
-        display:       "flex",
-        alignItems:    "center",
-        justifyContent: "center",
-        fontSize:       22,
-        flexShrink:     0,
-      }}>
-        {item.emoji}
-      </div>
+<div style={{
+  width: 46,
+  height: 46,
+  borderRadius: "var(--radius-md)",
+  background: "var(--cream-dark)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: 22,
+  flexShrink: 0,
+  overflow: "hidden",
+}}>
+  {item.image && item.image.startsWith("http") ? (
+    <img
+      src={item.image}
+      alt={item.name}
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+    />
+  ) : (
+    item.emoji || "🍔"
+  )}
+</div>
 
       {/* Name + price */}
       <div style={{ flex: 1, minWidth: 0 }}>
