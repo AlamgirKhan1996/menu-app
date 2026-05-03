@@ -303,15 +303,19 @@ export default function RestaurantPage({ client }) {
       )}
 
       {/* Cart Drawer */}
+      {cartOpen && (
       <CartDrawer
-        isOpen={cartOpen}
-        onClose={() => setCartOpen(false)}
-        cart={cart}
         client={client}
+        cart={cart}
         onAdd={addToCart}
         onRemove={removeFromCart}
+        onDelete={(itemId) => setCart(prev.filter(i => i.id !== itemId))}
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+        onClear={() => setCart([])}
         accentColor={client.accentColor}
       />
+      )}
     </div>
   );
 }
