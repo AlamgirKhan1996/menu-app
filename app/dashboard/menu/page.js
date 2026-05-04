@@ -126,7 +126,7 @@ export default function MenuPage() {
 
   async function handleDelete(id) {
     if (!confirm("Delete this item?")) return;
-    await fetch(`/api/dashboard/categories`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    await fetch(`/api/dashboard//menu/${id}`, { method: "DELETE"});
     await fetchAll();
   }
 
@@ -383,11 +383,7 @@ export default function MenuPage() {
                           }}
                         >✏️</button>
                         <button
-                          onClick={async () => {
-                            if (!confirm("Delete this item?")) return;
-                            await fetch(`/api/dashboard/categories`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: cat.id }) });
-                            await fetchAll();
-                          }}
+                          onClick={()=> handleDelete(item.id)}
                           style={{
                             width: 32, height: 32, borderRadius: 8,
                             background: "rgba(239,68,68,.7)",
