@@ -519,7 +519,7 @@ export default function MenuPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => handleDeleteCat(cat.id)}
+                  onClick={ async () => {if (!confirm("Delete category? Items will lose their category.")) return; await fetch(`/api/dashboard/categories/${cat.id}`, { method: "DELETE" }); await fetchAll(); }}
                   style={{
                     padding: "6px 12px",
                     background: "rgba(239,68,68,.1)",

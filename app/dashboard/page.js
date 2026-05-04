@@ -58,6 +58,7 @@ export default function DashboardPage() {
 
   const quickLinks = [
     { href: "/dashboard/orders", icon: "📋", label: "Live Orders", value: `${newOrders} new`, color: newOrders > 0 ? "#EF4444" : "#25D366", urgent: newOrders > 0 },
+    { href: "/dashboard/analytics", icon: "📊", label: "Analytics", value: "View stats", color: "#8B5CF6" },
     { href: "/dashboard/menu", icon: "🍔", label: "Menu Items", value: `${menuCount} items`, color: "#8B5CF6" },
     { href: "/dashboard/qr", icon: "📱", label: "QR Code", value: "Download", color: "#F59E0B" },
     { href: "/dashboard/settings", icon: "⚙️", label: "Settings", value: "Configure", color: "#06B6D4" },
