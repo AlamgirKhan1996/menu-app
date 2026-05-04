@@ -9,7 +9,6 @@ export async function GET() {
 
   const categories = await prisma.category.findMany({
     where: { restaurantId: session.user.restaurantId },
-    orderBy: { order: "asc" },
     include: { _count: { select: { menuItems: true } } },
   });
 
