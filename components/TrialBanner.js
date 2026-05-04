@@ -41,7 +41,7 @@ export default function TrialBanner() {
             Your Free Trial Has Ended
           </h2>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,.5)", lineHeight: 1.7, marginBottom: 24 }}>
-            Your 14-day free trial is over. Upgrade to keep your menu live and continue receiving orders.
+            Your 7-day free trial is over. Upgrade to keep your menu live and continue receiving orders.
           </p>
 
           {/* Pricing */}

@@ -31,9 +31,8 @@ export async function POST(request) {
       slug = `${baseSlug}-${counter++}`;
     }
 
-    // 🆕 Trial = 14 days from now
-    const trialEndsAt = new Date();
-    trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+    // 🆕 Trial = 7 days from now
+    const trialEndsAt = new Date((Date.now() + 7 * 24 * 60 * 60 * 1000)); // 7 days in ms
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
