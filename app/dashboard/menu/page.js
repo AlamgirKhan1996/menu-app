@@ -32,21 +32,20 @@ export default function MenuPage() {
 
   const fetchAll = useCallback(async () => {
     try {
-    const [itemsRes, catsRes] = await Promise.all([
-      fetch("/api/dashboard/menu"),
-      fetch("/api/dashboard/categories"),
-    ]);
-    const [itemsData, catsData] = await Promise.all([
-      itemsRes.json(),
-      catsRes.json(),
-    ]);
+    const itemsRes = await fetch("/api/dashboard/menu");
+    const itemsData = await itemsRes.json();
     setItems(Array.isArray(itemsData) ? itemsData : []);
-    setCategories(Array.isArray(catsData) ? catsData : []);
+    } catch (err) {
+      setItems([]);
     }
-    catch (err) {
-      console.error("Error fetching data:", err);
-      setLoading(false);
+    try {
+      const catsRes = await fetch("/api/dashboard/categories");
+      const catsData = await catsRes.json();
+      setCategories(Array.isArray(catsData) ? catsData : []);
+    } catch (err) {
+      setCategories([]);
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
