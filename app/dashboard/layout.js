@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Providers from "./providers";
-import Sidebar from "./components/Sidebar";
+import MobileLayout from "./components/MobileLayout";
 import TrialBanner from "@/components/TrialBanner";
 
 export default async function DashboardLayout({ children }) {
@@ -11,13 +11,10 @@ export default async function DashboardLayout({ children }) {
 
   return (
     <Providers>
-      <div style={{ display: "flex", minHeight: "100vh", background: "#0A0C0E" }}>
-        <Sidebar restaurant={session.user} />
-        <main style={{ flex: 1, overflowY: "auto" }}>
-          <TrialBanner />
-          {children}
-        </main>
-      </div>
+      <MobileLayout session={session}>
+        <TrialBanner />
+        {children}
+      </MobileLayout>
     </Providers>
   );
 }

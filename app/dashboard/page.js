@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -11,6 +11,20 @@ export default function DashboardPage() {
   const router = useRouter();
   const [menuCount, setMenuCount] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function requestNotifications() {
+      if (!("Notification" in window)) return;
+      if (Notification.permission === "granted") return;
+      if (Notification.permission !== "denied") return;
+
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        console.log("PushNotifications enabled!");
+      }
+    }
+    requestNotifications();
+  }, []);
 
   useEffect(() => {
     async function fetchStats() {

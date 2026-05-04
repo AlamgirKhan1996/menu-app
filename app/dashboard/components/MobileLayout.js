@@ -1,0 +1,370 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import InstallPWA from "@/components/InstallPWA";
+
+const navLinks = [
+  { href: "/dashboard", icon: "🏠", label: "Home" },
+  { href: "/dashboard/orders", icon: "📋", label: "Orders" },
+  { href: "/dashboard/menu", icon: "🍔", label: "Menu" },
+  { href: "/dashboard/analytics", icon: "📊", label: "Analytics" },
+  { href: "/dashboard/settings", icon: "⚙️", label: "Settings" },
+];
+
+export default function MobileLayout({ children, session }) {
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Close sidebar when route changes
+  useEffect(() => { setSidebarOpen(false); }, [pathname]);
+
+  return (
+    <div style={{
+      display: "flex",
+      minHeight: "100vh",
+      background: "#0A0C0E",
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    }}>
+
+      {/* ── DESKTOP SIDEBAR ── */}
+      {!isMobile && (
+        <aside style={{
+          width: 240,
+          background: "#111416",
+          borderRight: "1px solid rgba(255,255,255,.06)",
+          display: "flex",
+          flexDirection: "column",
+          padding: "24px 0",
+          position: "sticky",
+          top: 0,
+          height: "100vh",
+          flexShrink: 0,
+        }}>
+          <SidebarContent session={session} pathname={pathname} />
+        </aside>
+      )}
+
+      {/* ── MOBILE SIDEBAR OVERLAY ── */}
+      {isMobile && sidebarOpen && (
+        <>
+          <div
+            onClick={() => setSidebarOpen(false)}
+            style={{
+              position: "fixed", inset: 0,
+              background: "rgba(0,0,0,.7)",
+              zIndex: 998,
+              backdropFilter: "blur(4px)",
+            }}
+          />
+          <aside style={{
+            position: "fixed",
+            top: 0, left: 0, bottom: 0,
+            width: 280,
+            background: "#111416",
+            borderRight: "1px solid rgba(255,255,255,.06)",
+            display: "flex",
+            flexDirection: "column",
+            padding: "24px 0",
+            zIndex: 999,
+            transform: "translateX(0)",
+            transition: "transform .3s ease",
+            boxShadow: "4px 0 40px rgba(0,0,0,.5)",
+          }}>
+            <SidebarContent session={session} pathname={pathname} />
+          </aside>
+        </>
+      )}
+
+      {/* ── MAIN CONTENT ── */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        minWidth: 0,
+        paddingBottom: isMobile ? 80 : 0, // space for bottom nav
+      }}>
+
+        {/* Mobile Top Bar */}
+        {isMobile && (
+          <div style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 100,
+            background: "#111416",
+            borderBottom: "1px solid rgba(255,255,255,.06)",
+            padding: "14px 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+            {/* Hamburger */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              style={{
+                background: "rgba(255,255,255,.08)",
+                border: "none",
+                borderRadius: 10,
+                width: 40, height: 40,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 5,
+                cursor: "pointer",
+                padding: 10,
+              }}
+            >
+              {[0,1,2].map(i => (
+                <div key={i} style={{
+                  width: 20, height: 2,
+                  background: "#fff",
+                  borderRadius: 1,
+                }} />
+              ))}
+            </button>
+
+            {/* Logo */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{
+                width: 32, height: 32,
+                background: "#25D366",
+                borderRadius: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 16,
+              }}>💬</div>
+              <span style={{ fontWeight: 800, fontSize: 16, color: "#fff" }}>
+                OrderFlow
+              </span>
+            </div>
+
+            {/* New Order Indicator */}
+            <NewOrderBadge />
+          </div>
+        )}
+
+        {/* Page Content */}
+        <main style={{ flex: 1, overflowY: "auto" }}>
+          {children}
+          <InstallPWA />
+        </main>
+      </div>
+
+      {/* ── MOBILE BOTTOM NAVIGATION ── */}
+      {isMobile && (
+        <nav style={{
+          position: "fixed",
+          bottom: 0, left: 0, right: 0,
+          background: "#111416",
+          borderTop: "1px solid rgba(255,255,255,.08)",
+          display: "flex",
+          zIndex: 100,
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}>
+          {navLinks.map(link => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 4px",
+                  textDecoration: "none",
+                  position: "relative",
+                  gap: 3,
+                }}
+              >
+                {/* Active indicator */}
+                {active && (
+                  <div style={{
+                    position: "absolute",
+                    top: 0, left: "20%", right: "20%",
+                    height: 2,
+                    background: "#25D366",
+                    borderRadius: "0 0 4px 4px",
+                  }} />
+                )}
+                <span style={{
+                  fontSize: 20,
+                  filter: active ? "none" : "grayscale(0.5)",
+                  opacity: active ? 1 : 0.5,
+                }}>
+                  {link.icon}
+                </span>
+                <span style={{
+                  fontSize: 9,
+                  fontWeight: active ? 700 : 500,
+                  color: active ? "#25D366" : "rgba(255,255,255,.4)",
+                }}>
+                  {link.label}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+      )}
+    </div>
+  );
+}
+
+// ── SIDEBAR CONTENT (shared between desktop + mobile drawer) ──
+function SidebarContent({ session, pathname }) {
+  return (
+    <>
+      {/* Logo */}
+      <div style={{ padding: "0 20px 24px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+          <div style={{
+            width: 38, height: 38,
+            background: "#25D366",
+            borderRadius: 10,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 20,
+          }}>💬</div>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 15, color: "#fff" }}>OrderFlow</div>
+            <div style={{ fontSize: 10, color: "#25D366", fontWeight: 600 }}>DASHBOARD</div>
+          </div>
+        </div>
+        <div style={{
+          background: "rgba(37,211,102,.08)",
+          border: "1px solid rgba(37,211,102,.15)",
+          borderRadius: 8, padding: "8px 10px",
+        }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", marginBottom: 2 }}>
+            {session?.user?.restaurantName}
+          </div>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>
+            {session?.user?.plan || "FREE"} Plan
+          </div>
+        </div>
+      </div>
+
+      {/* Nav Links */}
+      <nav style={{ flex: 1, padding: "16px 12px" }}>
+        {[
+          { href: "/dashboard", icon: "🏠", label: "Home" },
+          { href: "/dashboard/menu", icon: "🍔", label: "Menu Manager" },
+          { href: "/dashboard/orders", icon: "📋", label: "Live Orders" },
+          { href: "/dashboard/analytics", icon: "📊", label: "Analytics" },
+          { href: "/dashboard/qr", icon: "📱", label: "QR Code" },
+          { href: "/dashboard/settings", icon: "⚙️", label: "Settings" },
+          { href: "/dashboard/upgrade", icon: "⚡", label: "Upgrade Plan" },
+        ].map(link => {
+          const active = pathname === link.href;
+          return (
+            <Link key={link.href} href={link.href} style={{ textDecoration: "none" }}>
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 12px",
+                borderRadius: 8,
+                marginBottom: 4,
+                background: active ? "rgba(37,211,102,.12)" : "transparent",
+                border: active ? "1px solid rgba(37,211,102,.2)" : "1px solid transparent",
+                transition: "all .15s",
+              }}>
+                <span style={{ fontSize: 18 }}>{link.icon}</span>
+                <span style={{
+                  fontSize: 14,
+                  fontWeight: active ? 700 : 500,
+                  color: active ? "#25D366" : "rgba(255,255,255,.6)",
+                }}>
+                  {link.label}
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Sign Out */}
+      <div style={{ padding: "16px 12px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
+        <button
+          onClick={() => signOut({ callbackUrl: "/restaurant-auth/signin" })}
+          style={{
+            width: "100%",
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "10px 12px",
+            borderRadius: 8,
+            background: "transparent", border: "none",
+            cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          <span style={{ fontSize: 18 }}>🚪</span>
+          <span style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,.4)" }}>
+            Sign Out
+          </span>
+        </button>
+      </div>
+    </>
+  );
+}
+
+// ── NEW ORDER BADGE ──
+function NewOrderBadge() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch("/api/dashboard/orders");
+        const data = await res.json();
+        const newOrders = Array.isArray(data)
+          ? data.filter(o => o.status === "NEW").length
+          : 0;
+        setCount(newOrders);
+      } catch (e) {}
+    };
+    check();
+    const interval = setInterval(check, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <Link href="/dashboard/orders" style={{ textDecoration: "none" }}>
+      <div style={{
+        width: 40, height: 40,
+        background: count > 0 ? "rgba(239,68,68,.15)" : "rgba(255,255,255,.06)",
+        border: count > 0 ? "1px solid rgba(239,68,68,.3)" : "1px solid rgba(255,255,255,.1)",
+        borderRadius: 10,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        position: "relative",
+        cursor: "pointer",
+      }}>
+        <span style={{ fontSize: 18 }}>📋</span>
+        {count > 0 && (
+          <div style={{
+            position: "absolute", top: -4, right: -4,
+            width: 18, height: 18,
+            background: "#EF4444",
+            borderRadius: "50%",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 9, fontWeight: 900, color: "#fff",
+            border: "2px solid #111416",
+          }}>
+            {count}
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}
