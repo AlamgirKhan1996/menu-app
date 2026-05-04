@@ -29,12 +29,13 @@ export default function MenuPage() {
   const [catNameAr, setCatNameAr] = useState("");
   const [savingCat, setSavingCat] = useState(false);
   const [filterCat, setFilterCat] = useState("all");
+  const [editingCat, setEditingCat] = useState(null);
 
   const fetchAll = useCallback(async () => {
     try {
-    const itemsRes = await fetch("/api/dashboard/menu");
-    const itemsData = await itemsRes.json();
-    setItems(Array.isArray(itemsData) ? itemsData : []);
+      const itemsRes = await fetch("/api/dashboard/menu");
+      const itemsData = await itemsRes.json();
+      setItems(Array.isArray(itemsData) ? itemsData : []);
     } catch (err) {
       setItems([]);
     }
@@ -52,10 +53,7 @@ export default function MenuPage() {
 
   function openAdd() {
     setEditingItem(null);
-    setItemForm({
-      ...EMPTY_FORM,
-      categoryId: categories[0]?.id || "",
-    });
+    setItemForm({ ...EMPTY_FORM, categoryId: categories[0]?.id || "" });
     setAiResult(null);
     setError("");
     setShowModal(true);
@@ -96,9 +94,7 @@ export default function MenuPage() {
     setSaving(true);
     setError("");
     try {
-      const url = editingItem
-        ? `/api/dashboard/menu/${editingItem.id}`
-        : "/api/dashboard/menu";
+      const url = editingItem ? `/api/dashboard/menu/${editingItem.id}` : "/api/dashboard/menu";
       const method = editingItem ? "PUT" : "POST";
       const payload = {
         name: itemForm.name,
@@ -128,9 +124,10 @@ export default function MenuPage() {
     }
   }
 
+  // ✅ FIXED: single slash in URL
   async function handleDelete(id) {
     if (!confirm("Delete this item?")) return;
-    await fetch(`/api/dashboard//menu/${id}`, { method: "DELETE"});
+    await fetch(`/api/dashboard/menu/${id}`, { method: "DELETE" });
     await fetchAll();
   }
 
@@ -180,6 +177,17 @@ export default function MenuPage() {
   async function handleDeleteCat(id) {
     if (!confirm("Delete category? Items will lose their category.")) return;
     await fetch(`/api/dashboard/categories/${id}`, { method: "DELETE" });
+    await fetchAll();
+  }
+
+  async function handleEditCat() {
+    if (!editingCat?.name) return;
+    await fetch("/api/dashboard/categories", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editingCat),
+    });
+    setEditingCat(null);
     await fetchAll();
   }
 
@@ -250,7 +258,6 @@ export default function MenuPage() {
       {/* ITEMS TAB */}
       {activeTab === "items" && (
         <>
-          {/* Category Filter */}
           {categories.length > 0 && (
             <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
               <button
@@ -283,7 +290,6 @@ export default function MenuPage() {
             </div>
           )}
 
-          {/* Items Grid */}
           {filteredItems.length === 0 ? (
             <div style={{
               textAlign: "center", padding: "60px 20px",
@@ -292,31 +298,14 @@ export default function MenuPage() {
               borderRadius: 16,
             }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🍽️</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>
-                No items yet
-              </div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,.25)", marginBottom: 20 }}>
-                Add your first menu item to get started
-              </div>
-              <button
-                onClick={openAdd}
-                style={{
-                  padding: "10px 24px",
-                  background: "#25D366", border: "none",
-                  borderRadius: 10, color: "#fff",
-                  fontSize: 13, fontWeight: 700,
-                  cursor: "pointer", fontFamily: "inherit",
-                }}
-              >
+              <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(255,255,255,.4)", marginBottom: 8 }}>No items yet</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,.25)", marginBottom: 20 }}>Add your first menu item to get started</div>
+              <button onClick={openAdd} style={{ padding: "10px 24px", background: "#25D366", border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                 + Add First Item
               </button>
             </div>
           ) : (
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: 14,
-            }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
               {filteredItems.map(item => {
                 const mainImage = item.images?.[0] || item.image;
                 const hasRealImage = mainImage && mainImage.startsWith("http");
@@ -326,123 +315,65 @@ export default function MenuPage() {
                     background: "rgba(255,255,255,.04)",
                     border: "1px solid rgba(255,255,255,.08)",
                     borderRadius: 14, overflow: "hidden",
-                    transition: "border-color .2s",
                   }}>
-                    {/* Image */}
                     <div style={{
                       height: 160,
-                      background: hasRealImage
-                        ? `url(${mainImage}) center/cover`
-                        : "linear-gradient(135deg, #1a1a2e, #16213e)",
+                      background: hasRealImage ? `url(${mainImage}) center/cover` : "linear-gradient(135deg, #1a1a2e, #16213e)",
                       display: "flex", alignItems: "center",
                       justifyContent: "center", fontSize: 56,
                       position: "relative",
                     }}>
                       {!hasRealImage && (mainImage || "🍔")}
 
-                      {/* Badges */}
                       <div style={{ position: "absolute", top: 10, left: 10, display: "flex", gap: 6 }}>
                         {item.isFeatured && (
-                          <span style={{
-                            background: "#F59E0B", color: "#000",
-                            fontSize: 10, fontWeight: 800,
-                            padding: "3px 8px", borderRadius: 99,
-                          }}>⭐ FEATURED</span>
+                          <span style={{ background: "#F59E0B", color: "#000", fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 99 }}>⭐ FEATURED</span>
                         )}
                         {!item.isAvailable && (
-                          <span style={{
-                            background: "rgba(239,68,68,.9)", color: "#fff",
-                            fontSize: 10, fontWeight: 800,
-                            padding: "3px 8px", borderRadius: 99,
-                          }}>UNAVAILABLE</span>
+                          <span style={{ background: "rgba(239,68,68,.9)", color: "#fff", fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 99 }}>UNAVAILABLE</span>
                         )}
                       </div>
 
-                      {/* Multiple images indicator */}
                       {item.images?.length > 1 && (
-                        <div style={{
-                          position: "absolute", bottom: 8, right: 8,
-                          background: "rgba(0,0,0,.6)",
-                          borderRadius: 99, padding: "3px 8px",
-                          fontSize: 10, fontWeight: 700, color: "#fff",
-                        }}>
+                        <div style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,.6)", borderRadius: 99, padding: "3px 8px", fontSize: 10, fontWeight: 700, color: "#fff" }}>
                           📸 {item.images.length}
                         </div>
                       )}
 
-                      {/* Action buttons */}
-                      <div style={{
-                        position: "absolute", top: 8, right: 8,
-                        display: "flex", gap: 6,
-                      }}>
+                      <div style={{ position: "absolute", top: 8, right: 8, display: "flex", gap: 6 }}>
                         <button
                           onClick={() => openEdit(item)}
-                          style={{
-                            width: 32, height: 32, borderRadius: 8,
-                            background: "rgba(0,0,0,.6)",
-                            border: "1px solid rgba(255,255,255,.2)",
-                            color: "#fff", fontSize: 14,
-                            cursor: "pointer", display: "flex",
-                            alignItems: "center", justifyContent: "center",
-                          }}
+                          style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(0,0,0,.6)", border: "1px solid rgba(255,255,255,.2)", color: "#fff", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                         >✏️</button>
                         <button
-                          onClick={()=> handleDelete(item.id)}
-                          style={{
-                            width: 32, height: 32, borderRadius: 8,
-                            background: "rgba(239,68,68,.7)",
-                            border: "none", color: "#fff",
-                            fontSize: 14, cursor: "pointer",
-                            display: "flex", alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                          onClick={() => handleDelete(item.id)}
+                          style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(239,68,68,.7)", border: "none", color: "#fff", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                         >🗑️</button>
                       </div>
                     </div>
 
-                    {/* Info */}
                     <div style={{ padding: "14px 16px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 800, fontSize: 15, color: "#fff", marginBottom: 2 }}>
-                            {item.name}
-                          </div>
+                          <div style={{ fontWeight: 800, fontSize: 15, color: "#fff", marginBottom: 2 }}>{item.name}</div>
                           {item.nameAr && (
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", direction: "rtl" }}>
-                              {item.nameAr}
-                            </div>
+                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", direction: "rtl" }}>{item.nameAr}</div>
                           )}
                         </div>
                         <div style={{ fontSize: 16, fontWeight: 900, color: "#25D366", marginLeft: 12, flexShrink: 0 }}>
                           SAR {item.price}
                         </div>
                       </div>
-
                       {item.description && (
-                        <div style={{
-                          fontSize: 12, color: "rgba(255,255,255,.4)",
-                          lineHeight: 1.5, marginTop: 6,
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}>
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", lineHeight: 1.5, marginTop: 6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                           {item.description}
                         </div>
                       )}
-
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                        <span style={{
-                          fontSize: 11, color: "rgba(255,255,255,.3)",
-                          background: "rgba(255,255,255,.06)",
-                          padding: "3px 8px", borderRadius: 6,
-                        }}>
+                        <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)", background: "rgba(255,255,255,.06)", padding: "3px 8px", borderRadius: 6 }}>
                           {cat?.name || "Uncategorized"}
                         </span>
-                        <span style={{
-                          fontSize: 11, fontWeight: 700,
-                          color: item.isAvailable ? "#25D366" : "#EF4444",
-                        }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: item.isAvailable ? "#25D366" : "#EF4444" }}>
                           {item.isAvailable ? "● Available" : "● Unavailable"}
                         </span>
                       </div>
@@ -458,288 +389,143 @@ export default function MenuPage() {
       {/* CATEGORIES TAB */}
       {activeTab === "categories" && (
         <div style={{ maxWidth: 500 }}>
-          {/* Add Category Form */}
-          <div style={{
-            background: "rgba(255,255,255,.04)",
-            border: "1px solid rgba(255,255,255,.08)",
-            borderRadius: 14, padding: "20px",
-            marginBottom: 20,
-          }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 14 }}>
-              Add New Category
-            </div>
+          <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "20px", marginBottom: 20 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 14 }}>Add New Category</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <input
-                style={inp}
-                placeholder="Category name (English) e.g. Burgers"
-                value={catName}
-                onChange={e => setCatName(e.target.value)}
-              />
-              <input
-                style={{ ...inp, direction: "rtl" }}
-                placeholder="اسم الفئة بالعربي مثال: برجر"
-                value={catNameAr}
-                onChange={e => setCatNameAr(e.target.value)}
-              />
+              <input style={inp} placeholder="Category name (English) e.g. Burgers" value={catName} onChange={e => setCatName(e.target.value)} />
+              <input style={{ ...inp, direction: "rtl" }} placeholder="اسم الفئة بالعربي مثال: برجر" value={catNameAr} onChange={e => setCatNameAr(e.target.value)} />
               <button
                 onClick={handleAddCategory}
                 disabled={!catName || savingCat}
-                style={{
-                  padding: "10px",
-                  background: catName ? "#25D366" : "rgba(255,255,255,.06)",
-                  border: "none", borderRadius: 10,
-                  color: catName ? "#fff" : "rgba(255,255,255,.3)",
-                  fontSize: 13, fontWeight: 700,
-                  cursor: catName ? "pointer" : "not-allowed",
-                  fontFamily: "inherit",
-                }}
+                style={{ padding: "10px", background: catName ? "#25D366" : "rgba(255,255,255,.06)", border: "none", borderRadius: 10, color: catName ? "#fff" : "rgba(255,255,255,.3)", fontSize: 13, fontWeight: 700, cursor: catName ? "pointer" : "not-allowed", fontFamily: "inherit" }}
               >
                 {savingCat ? "Adding..." : "+ Add Category"}
               </button>
             </div>
           </div>
 
-          {/* Category List */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {categories.map(cat => (
-              <div key={cat.id} style={{
-                background: "rgba(255,255,255,.04)",
-                border: "1px solid rgba(255,255,255,.08)",
-                borderRadius: 12, padding: "14px 16px",
-                display: "flex", justifyContent: "space-between",
-                alignItems: "center",
-              }}>
-                <div>
-                  <div style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{cat.name}</div>
-                  {cat.nameAr && (
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", direction: "rtl" }}>{cat.nameAr}</div>
-                  )}
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 4 }}>
-                    {items.filter(i => i.categoryId === cat.id).length} items
+              <div key={cat.id} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: "14px 16px" }}>
+                {editingCat?.id === cat.id ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <input style={inp} placeholder="Category name (English)" value={editingCat.name} onChange={e => setEditingCat(p => ({ ...p, name: e.target.value }))} />
+                    <input style={{ ...inp, direction: "rtl" }} placeholder="اسم الفئة بالعربي" value={editingCat.nameAr} onChange={e => setEditingCat(p => ({ ...p, nameAr: e.target.value }))} />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={handleEditCat} style={{ flex: 1, padding: "8px", background: "#25D366", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>✓ Save</button>
+                      <button onClick={() => setEditingCat(null)} style={{ padding: "8px 16px", background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, color: "rgba(255,255,255,.5)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+                    </div>
                   </div>
-                </div>
-                <button
-                  onClick={ async () => {if (!confirm("Delete category? Items will lose their category.")) return; await fetch(`/api/dashboard/categories/${cat.id}`, { method: "DELETE" }); await fetchAll(); }}
-                  style={{
-                    padding: "6px 12px",
-                    background: "rgba(239,68,68,.1)",
-                    border: "1px solid rgba(239,68,68,.2)",
-                    borderRadius: 8, color: "#EF4444",
-                    fontSize: 12, fontWeight: 700,
-                    cursor: "pointer", fontFamily: "inherit",
-                  }}
-                >
-                  Delete
-                </button>
+                ) : (
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{cat.name}</div>
+                      {cat.nameAr && <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", direction: "rtl" }}>{cat.nameAr}</div>}
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 4 }}>{items.filter(i => i.categoryId === cat.id).length} items</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        onClick={() => setEditingCat({ id: cat.id, name: cat.name, nameAr: cat.nameAr || "" })}
+                        style={{ padding: "6px 12px", background: "rgba(37,211,102,.1)", border: "1px solid rgba(37,211,102,.2)", borderRadius: 8, color: "#25D366", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                      >✏️ Edit</button>
+                      <button
+                        onClick={() => handleDeleteCat(cat.id)}
+                        style={{ padding: "6px 12px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", borderRadius: 8, color: "#EF4444", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                      >🗑️ Delete</button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* ==================== MODAL ==================== */}
+      {/* MODAL */}
       {showModal && (
-        <div style={{
-          position: "fixed", inset: 0,
-          background: "rgba(0,0,0,.85)",
-          zIndex: 999, display: "flex",
-          alignItems: "center", justifyContent: "center",
-          padding: 16, overflowY: "auto",
-        }}>
-          <div style={{
-            background: "#0f1923",
-            border: "1px solid rgba(255,255,255,.1)",
-            borderRadius: 20, width: "100%",
-            maxWidth: 560,
-            maxHeight: "90vh",
-            overflowY: "auto",
-            padding: "28px 24px",
-            position: "relative",
-          }}>
-            {/* Modal Header */}
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.85)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, overflowY: "auto" }}>
+          <div style={{ background: "#0f1923", border: "1px solid rgba(255,255,255,.1)", borderRadius: 20, width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto", padding: "28px 24px", position: "relative" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>
-                {editingItem ? "✏️ Edit Item" : "➕ Add Menu Item"}
-              </h2>
-              <button
-                onClick={closeModal}
-                style={{
-                  width: 32, height: 32, borderRadius: "50%",
-                  background: "rgba(255,255,255,.08)",
-                  border: "none", color: "#fff",
-                  fontSize: 18, cursor: "pointer",
-                  display: "flex", alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >×</button>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>{editingItem ? "✏️ Edit Item" : "➕ Add Menu Item"}</h2>
+              <button onClick={closeModal} style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,.08)", border: "none", color: "#fff", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
             </div>
 
             {error && (
-              <div style={{
-                background: "rgba(239,68,68,.1)",
-                border: "1px solid rgba(239,68,68,.2)",
-                borderRadius: 10, padding: "10px 14px",
-                color: "#EF4444", fontSize: 13,
-                marginBottom: 16,
-              }}>
+              <div style={{ background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", borderRadius: 10, padding: "10px 14px", color: "#EF4444", fontSize: 13, marginBottom: 16 }}>
                 {error}
               </div>
             )}
 
-            {/* Name Fields */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>
-                  Item Name *
-                </label>
-                <input
-                  style={inp}
-                  placeholder="e.g. Smash Burger"
-                  value={itemForm.name}
-                  onChange={e => setItemForm(p => ({ ...p, name: e.target.value }))}
-                />
+                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>Item Name *</label>
+                <input style={inp} placeholder="e.g. Smash Burger" value={itemForm.name} onChange={e => setItemForm(p => ({ ...p, name: e.target.value }))} />
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>
-                  اسم العنصر
-                </label>
-                <input
-                  style={{ ...inp, direction: "rtl" }}
-                  placeholder="برجر سماش"
-                  value={itemForm.nameAr}
-                  onChange={e => setItemForm(p => ({ ...p, nameAr: e.target.value }))}
-                />
+                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>اسم العنصر</label>
+                <input style={{ ...inp, direction: "rtl" }} placeholder="برجر سماش" value={itemForm.nameAr} onChange={e => setItemForm(p => ({ ...p, nameAr: e.target.value }))} />
               </div>
             </div>
 
-            {/* Price + Category */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>
-                  Price (SAR) *
-                </label>
-                <input
-                  style={inp}
-                  type="number"
-                  placeholder="25"
-                  value={itemForm.price}
-                  onChange={e => setItemForm(p => ({ ...p, price: e.target.value }))}
-                />
+                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>Price (SAR) *</label>
+                <input style={inp} type="number" placeholder="25" value={itemForm.price} onChange={e => setItemForm(p => ({ ...p, price: e.target.value }))} />
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>
-                  Category *
-                </label>
-                <select
-                  style={{ ...inp, cursor: "pointer" }}
-                  value={itemForm.categoryId}
-                  onChange={e => setItemForm(p => ({ ...p, categoryId: e.target.value }))}
-                >
+                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>Category *</label>
+                <select style={{ ...inp, cursor: "pointer" }} value={itemForm.categoryId} onChange={e => setItemForm(p => ({ ...p, categoryId: e.target.value }))}>
                   <option value="">Select category</option>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
             </div>
 
-            {/* AI Menu Writer */}
-            <div style={{
-              background: "linear-gradient(135deg, rgba(139,92,246,.1), rgba(37,211,102,.06))",
-              border: "1px solid rgba(139,92,246,.2)",
-              borderRadius: 12, padding: "14px 16px",
-              marginBottom: 14,
-            }}>
+            <div style={{ background: "linear-gradient(135deg, rgba(139,92,246,.1), rgba(37,211,102,.06))", border: "1px solid rgba(139,92,246,.2)", borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: aiResult ? 10 : 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 16 }}>✨</span>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>AI Menu Writer</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>
-                      {itemForm.name ? "Ready to generate!" : "Enter item name first"}
-                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{itemForm.name ? "Ready to generate!" : "Enter item name first"}</div>
                   </div>
                 </div>
                 <button
                   onClick={handleAIGenerate}
                   disabled={!itemForm.name || aiLoading}
-                  style={{
-                    padding: "8px 16px",
-                    background: !itemForm.name || aiLoading
-                      ? "rgba(255,255,255,.06)"
-                      : "linear-gradient(135deg, #8B5CF6, #25D366)",
-                    border: "none", borderRadius: 20,
-                    color: !itemForm.name || aiLoading ? "rgba(255,255,255,.3)" : "#fff",
-                    fontSize: 12, fontWeight: 700,
-                    cursor: !itemForm.name || aiLoading ? "not-allowed" : "pointer",
-                    fontFamily: "inherit",
-                    display: "flex", alignItems: "center", gap: 6,
-                  }}
+                  style={{ padding: "8px 16px", background: !itemForm.name || aiLoading ? "rgba(255,255,255,.06)" : "linear-gradient(135deg, #8B5CF6, #25D366)", border: "none", borderRadius: 20, color: !itemForm.name || aiLoading ? "rgba(255,255,255,.3)" : "#fff", fontSize: 12, fontWeight: 700, cursor: !itemForm.name || aiLoading ? "not-allowed" : "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}
                 >
                   {aiLoading ? "Writing..." : "🤖 Generate"}
                 </button>
               </div>
               {aiResult && (
-                <div style={{
-                  background: "rgba(0,0,0,.25)", borderRadius: 8,
-                  padding: "10px 12px", fontSize: 12,
-                  color: "rgba(255,255,255,.6)", lineHeight: 1.6,
-                  borderLeft: "3px solid #8B5CF6",
-                }}>
-                  <div style={{ marginBottom: 4 }}>
-                    <span style={{ color: "#25D366", fontWeight: 700 }}>EN: </span>
-                    {aiResult.descriptionEn}
-                  </div>
-                  <div style={{ direction: "rtl", textAlign: "right" }}>
-                    <span style={{ color: "#8B5CF6", fontWeight: 700 }}>AR: </span>
-                    {aiResult.descriptionAr}
-                  </div>
+                <div style={{ background: "rgba(0,0,0,.25)", borderRadius: 8, padding: "10px 12px", fontSize: 12, color: "rgba(255,255,255,.6)", lineHeight: 1.6, borderLeft: "3px solid #8B5CF6" }}>
+                  <div style={{ marginBottom: 4 }}><span style={{ color: "#25D366", fontWeight: 700 }}>EN: </span>{aiResult.descriptionEn}</div>
+                  <div style={{ direction: "rtl", textAlign: "right" }}><span style={{ color: "#8B5CF6", fontWeight: 700 }}>AR: </span>{aiResult.descriptionAr}</div>
                 </div>
               )}
             </div>
 
-            {/* Description Fields */}
             <div style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)" }}>
-                  Description (English)
-                </label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)" }}>Description (English)</label>
                 {aiResult?.descriptionEn && (
-                  <button onClick={() => setItemForm(p => ({ ...p, description: aiResult.descriptionEn }))}
-                    style={{ fontSize: 10, fontWeight: 700, color: "#25D366", background: "rgba(37,211,102,.1)", border: "1px solid rgba(37,211,102,.2)", borderRadius: 6, padding: "2px 8px", cursor: "pointer", fontFamily: "inherit" }}>
-                    ✓ Use AI
-                  </button>
+                  <button onClick={() => setItemForm(p => ({ ...p, description: aiResult.descriptionEn }))} style={{ fontSize: 10, fontWeight: 700, color: "#25D366", background: "rgba(37,211,102,.1)", border: "1px solid rgba(37,211,102,.2)", borderRadius: 6, padding: "2px 8px", cursor: "pointer", fontFamily: "inherit" }}>✓ Use AI</button>
                 )}
               </div>
-              <textarea
-                style={{ ...inp, minHeight: 60, resize: "vertical" }}
-                placeholder="Mouth-watering description..."
-                value={itemForm.description}
-                onChange={e => setItemForm(p => ({ ...p, description: e.target.value }))}
-              />
+              <textarea style={{ ...inp, minHeight: 60, resize: "vertical" }} placeholder="Mouth-watering description..." value={itemForm.description} onChange={e => setItemForm(p => ({ ...p, description: e.target.value }))} />
             </div>
 
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)" }}>
-                  وصف العنصر (Arabic)
-                </label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.5)" }}>وصف العنصر (Arabic)</label>
                 {aiResult?.descriptionAr && (
-                  <button onClick={() => setItemForm(p => ({ ...p, descriptionAr: aiResult.descriptionAr }))}
-                    style={{ fontSize: 10, fontWeight: 700, color: "#8B5CF6", background: "rgba(139,92,246,.1)", border: "1px solid rgba(139,92,246,.2)", borderRadius: 6, padding: "2px 8px", cursor: "pointer", fontFamily: "inherit" }}>
-                    ✓ استخدم
-                  </button>
+                  <button onClick={() => setItemForm(p => ({ ...p, descriptionAr: aiResult.descriptionAr }))} style={{ fontSize: 10, fontWeight: 700, color: "#8B5CF6", background: "rgba(139,92,246,.1)", border: "1px solid rgba(139,92,246,.2)", borderRadius: 6, padding: "2px 8px", cursor: "pointer", fontFamily: "inherit" }}>✓ استخدم</button>
                 )}
               </div>
-              <textarea
-                style={{ ...inp, minHeight: 60, resize: "vertical", direction: "rtl" }}
-                placeholder="وصف شهي للطبق..."
-                value={itemForm.descriptionAr}
-                onChange={e => setItemForm(p => ({ ...p, descriptionAr: e.target.value }))}
-              />
+              <textarea style={{ ...inp, minHeight: 60, resize: "vertical", direction: "rtl" }} placeholder="وصف شهي للطبق..." value={itemForm.descriptionAr} onChange={e => setItemForm(p => ({ ...p, descriptionAr: e.target.value }))} />
             </div>
 
-            {/* IMAGE UPLOAD — ONLY HERE IN MODAL */}
             <div style={{ marginBottom: 16 }}>
               <ImageUploader
                 label="Item Photos (up to 4)"
@@ -747,30 +533,17 @@ export default function MenuPage() {
                 multiple={true}
                 maxImages={4}
                 currentImages={itemForm.images}
-                onImagesChange={(urls) => setItemForm(p => ({
-                  ...p,
-                  images: urls,
-                  image: urls[0] || null,
-                }))}
+                onImagesChange={(urls) => setItemForm(p => ({ ...p, images: urls, image: urls[0] || null }))}
                 folder="menu"
               />
             </div>
 
-            {/* Emoji fallback */}
             {itemForm.images.length === 0 && (
               <div style={{ marginBottom: 16 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.4)", display: "block", marginBottom: 8 }}>
-                  Or pick an icon (if no photo)
-                </label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.4)", display: "block", marginBottom: 8 }}>Or pick an icon (if no photo)</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {EMOJIS.map(e => (
-                    <button key={e} onClick={() => setItemForm(p => ({ ...p, image: e }))}
-                      style={{
-                        width: 36, height: 36, borderRadius: 8,
-                        border: itemForm.image === e ? "2px solid #25D366" : "1px solid rgba(255,255,255,.1)",
-                        background: itemForm.image === e ? "rgba(37,211,102,.15)" : "rgba(255,255,255,.04)",
-                        fontSize: 20, cursor: "pointer",
-                      }}>
+                    <button key={e} onClick={() => setItemForm(p => ({ ...p, image: e }))} style={{ width: 36, height: 36, borderRadius: 8, border: itemForm.image === e ? "2px solid #25D366" : "1px solid rgba(255,255,255,.1)", background: itemForm.image === e ? "rgba(37,211,102,.15)" : "rgba(255,255,255,.04)", fontSize: 20, cursor: "pointer" }}>
                       {e}
                     </button>
                   ))}
@@ -778,43 +551,18 @@ export default function MenuPage() {
               </div>
             )}
 
-            {/* Toggles */}
             <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
               {[
                 { label: "✅ Available", key: "isAvailable", color: "#25D366" },
                 { label: "⭐ Featured", key: "isFeatured", color: "#F59E0B" },
               ].map(({ label, key, color }) => (
-                <button
-                  key={key}
-                  onClick={() => setItemForm(p => ({ ...p, [key]: !p[key] }))}
-                  style={{
-                    flex: 1, padding: "10px",
-                    background: itemForm[key] ? `${color}15` : "rgba(255,255,255,.04)",
-                    border: itemForm[key] ? `1px solid ${color}40` : "1px solid rgba(255,255,255,.08)",
-                    borderRadius: 10, color: itemForm[key] ? color : "rgba(255,255,255,.4)",
-                    fontSize: 13, fontWeight: 700,
-                    cursor: "pointer", fontFamily: "inherit",
-                  }}
-                >
+                <button key={key} onClick={() => setItemForm(p => ({ ...p, [key]: !p[key] }))} style={{ flex: 1, padding: "10px", background: itemForm[key] ? `${color}15` : "rgba(255,255,255,.04)", border: itemForm[key] ? `1px solid ${color}40` : "1px solid rgba(255,255,255,.08)", borderRadius: 10, color: itemForm[key] ? color : "rgba(255,255,255,.4)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
                   {label}
                 </button>
               ))}
             </div>
 
-            {/* Save Button */}
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              style={{
-                width: "100%", padding: "14px",
-                background: saving ? "rgba(255,255,255,.06)" : "linear-gradient(135deg, #25D366, #128C7E)",
-                border: "none", borderRadius: 12,
-                color: saving ? "rgba(255,255,255,.3)" : "#fff",
-                fontSize: 15, fontWeight: 800,
-                cursor: saving ? "not-allowed" : "pointer",
-                fontFamily: "inherit",
-              }}
-            >
+            <button onClick={handleSave} disabled={saving} style={{ width: "100%", padding: "14px", background: saving ? "rgba(255,255,255,.06)" : "linear-gradient(135deg, #25D366, #128C7E)", border: "none", borderRadius: 12, color: saving ? "rgba(255,255,255,.3)" : "#fff", fontSize: 15, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit" }}>
               {saving ? "Saving..." : editingItem ? "Save Changes ✓" : "Add to Menu 🍽️"}
             </button>
           </div>
