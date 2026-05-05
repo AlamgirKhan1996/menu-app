@@ -23,13 +23,27 @@ export async function PATCH(request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  try {
+
   const { id, status } = await request.json();
 
+  const existing = await prisma.order.findFirst({
+      where: { id, restaurantId: session.user.restaurantId },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
   const order = await prisma.order.update({
-    where: { id, restaurantId: session.user.restaurantId },
+    where: { id },
     data: { status },
     include: { items: true },
   });
 
   return NextResponse.json(order);
+} catch (error) {
+  console.error("Error updating order:", error);
+  return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+}
 }
