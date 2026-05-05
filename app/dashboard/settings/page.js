@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import ImageUploader from "@/components/ImageUploader";
 
+
 export default function SettingsPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(true);
@@ -12,6 +13,7 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState("");
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
+  const [slug, setSlug] = useState("");
   const [form, setForm] = useState({
   name: "",
   nameAr: "",
@@ -28,12 +30,288 @@ export default function SettingsPage() {
   openTime: "10:00",
   closeTime: "23:00",
 });
+function SlugEditor({ currentSlug }) {
+  const [editing, setEditing] = useState(false);
+  const [newSlug, setNewSlug] = useState(currentSlug || "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
+  const menuUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/${newSlug}`
+    : `/${newSlug}`;
+
+  async function saveSlug() {
+    if (!confirmed) return;
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/dashboard/slug", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: newSlug }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error); setSaving(false); return; }
+      setSuccess(true);
+      setEditing(false);
+      setConfirmed(false);
+      // Reload after 1.5s so session + sidebar update
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (e) {
+      setError("Network error — try again");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inp = {
+    width: "100%",
+    background: "#1a1e22",
+    border: "1px solid rgba(255,255,255,.1)",
+    borderRadius: 8,
+    padding: "11px 14px",
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "inherit",
+    outline: "none",
+    boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{
+      background: editing ? "rgba(245,158,11,.06)" : "rgba(255,255,255,.03)",
+      border: editing ? "1px solid rgba(245,158,11,.25)" : "1px solid rgba(255,255,255,.08)",
+      borderRadius: 12,
+      padding: "16px 18px",
+      transition: "all .3s",
+    }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>
+            🔗 Menu URL Slug
+          </div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>
+            Your public menu link address
+          </div>
+        </div>
+        {!editing && (
+          <button
+            onClick={() => { setEditing(true); setNewSlug(currentSlug); setError(""); setSuccess(false); }}
+            style={{
+              padding: "6px 14px",
+              background: "rgba(255,255,255,.08)",
+              border: "1px solid rgba(255,255,255,.12)",
+              borderRadius: 8,
+              color: "rgba(255,255,255,.7)",
+              fontSize: 12, fontWeight: 600,
+              cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            ✏️ Change
+          </button>
+        )}
+      </div>
+
+      {/* Current URL display */}
+      {!editing && (
+        <div style={{
+          background: "rgba(0,0,0,.3)",
+          borderRadius: 8,
+          padding: "10px 12px",
+          fontFamily: "monospace",
+          fontSize: 13,
+          color: "#25D366",
+          wordBreak: "break-all",
+        }}>
+          {typeof window !== "undefined" ? window.location.origin : ""}/{currentSlug}
+        </div>
+      )}
+
+      {/* Editor */}
+      {editing && (
+        <div>
+          {/* ⚠️ Warning */}
+          <div style={{
+            background: "rgba(245,158,11,.1)",
+            border: "1px solid rgba(245,158,11,.25)",
+            borderRadius: 8,
+            padding: "10px 12px",
+            marginBottom: 12,
+            fontSize: 12,
+            color: "#F59E0B",
+            lineHeight: 1.6,
+          }}>
+            ⚠️ <strong>Warning:</strong> Changing your slug will break all existing QR codes and shared links.
+            Make sure to update your printed materials and social media bio link after changing.
+          </div>
+
+          {/* Slug input with prefix */}
+          <div style={{ marginBottom: 10 }}>
+            <label style={{ fontSize: 12, color: "rgba(255,255,255,.5)", display: "block", marginBottom: 6 }}>
+              New URL slug
+            </label>
+            <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+              <div style={{
+                padding: "11px 12px",
+                background: "rgba(255,255,255,.04)",
+                border: "1px solid rgba(255,255,255,.1)",
+                borderRight: "none",
+                borderRadius: "8px 0 0 8px",
+                fontSize: 12,
+                color: "rgba(255,255,255,.35)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}>
+                {typeof window !== "undefined" ? window.location.hostname : "yourdomain.com"}/
+              </div>
+              <input
+                style={{
+                  ...inp,
+                  borderRadius: "0 8px 8px 0",
+                  flex: 1,
+                }}
+                placeholder="your-restaurant-name"
+                value={newSlug}
+                onChange={e => {
+                  setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/--+/g, "-"));
+                  setError("");
+                  setConfirmed(false);
+                }}
+              />
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 5 }}>
+              Only lowercase letters, numbers, and hyphens. Min 3 chars.
+            </div>
+          </div>
+
+          {/* Live preview */}
+          {newSlug && (
+            <div style={{
+              background: "rgba(0,0,0,.3)",
+              borderRadius: 8,
+              padding: "8px 12px",
+              fontFamily: "monospace",
+              fontSize: 12,
+              color: newSlug === currentSlug ? "rgba(255,255,255,.3)" : "#25D366",
+              marginBottom: 12,
+              wordBreak: "break-all",
+            }}>
+              Preview: {menuUrl}
+              {newSlug === currentSlug && (
+                <span style={{ color: "#F59E0B", marginLeft: 8, fontFamily: "sans-serif" }}>
+                  (same as current)
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Error */}
+          {error && (
+            <div style={{
+              background: "rgba(239,68,68,.1)",
+              border: "1px solid rgba(239,68,68,.2)",
+              borderRadius: 8,
+              padding: "8px 12px",
+              color: "#EF4444",
+              fontSize: 12,
+              marginBottom: 12,
+            }}>
+              {error}
+            </div>
+          )}
+
+          {/* Confirmation checkbox */}
+          {newSlug && newSlug !== currentSlug && newSlug.length >= 3 && (
+            <label style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 10,
+              marginBottom: 14,
+              cursor: "pointer",
+              padding: "10px 12px",
+              background: "rgba(255,255,255,.03)",
+              borderRadius: 8,
+              border: "1px solid rgba(255,255,255,.07)",
+            }}>
+              <input
+                type="checkbox"
+                checked={confirmed}
+                onChange={e => setConfirmed(e.target.checked)}
+                style={{ marginTop: 2, flexShrink: 0 }}
+              />
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,.6)", lineHeight: 1.5 }}>
+                I understand my old menu link and QR codes will stop working.
+                I will update my shared links and printed materials.
+              </span>
+            </label>
+          )}
+
+          {/* Action buttons */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => { setEditing(false); setError(""); setConfirmed(false); }}
+              style={{
+                padding: "10px 18px",
+                background: "rgba(255,255,255,.06)",
+                border: "1px solid rgba(255,255,255,.1)",
+                borderRadius: 8,
+                color: "rgba(255,255,255,.5)",
+                fontSize: 13, fontWeight: 600,
+                cursor: "pointer", fontFamily: "inherit",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={saveSlug}
+              disabled={!confirmed || saving || newSlug === currentSlug || newSlug.length < 3}
+              style={{
+                flex: 1,
+                padding: "10px",
+                background: confirmed && newSlug !== currentSlug && newSlug.length >= 3
+                  ? "linear-gradient(135deg, #F59E0B, #D97706)"
+                  : "rgba(255,255,255,.06)",
+                border: "none",
+                borderRadius: 8,
+                color: confirmed && newSlug !== currentSlug ? "#000" : "rgba(255,255,255,.25)",
+                fontSize: 13, fontWeight: 800,
+                cursor: confirmed && newSlug !== currentSlug ? "pointer" : "not-allowed",
+                fontFamily: "inherit",
+              }}
+            >
+              {saving ? "Updating..." : "🔗 Update Slug"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Success */}
+      {success && (
+        <div style={{
+          marginTop: 10,
+          padding: "8px 12px",
+          background: "rgba(37,211,102,.1)",
+          border: "1px solid rgba(37,211,102,.2)",
+          borderRadius: 8,
+          color: "#25D366",
+          fontSize: 12,
+          fontWeight: 700,
+        }}>
+          ✅ Slug updated! Reloading...
+        </div>
+      )}
+    </div>
+  );
+}
   useEffect(() => { fetchSettings(); }, []);
 
   async function fetchSettings() {
     const res = await fetch("/api/dashboard/settings");
     const data = await res.json();
+    setSlug(data.slug || "");
     
     setForm({
   name: data.name || "",
@@ -483,8 +761,13 @@ export default function SettingsPage() {
               ))}
             </select>
           </div>
+
+          <SlugEditor currentSlug={slug} />
+
+
         </div>
       )}
+
 
       {/* WhatsApp Tab */}
       {activeTab === "whatsapp" && (
