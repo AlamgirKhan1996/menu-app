@@ -24,10 +24,10 @@ export async function PATCH(request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
+    const { id, status } = await request.json();
 
-  const { id, status } = await request.json();
-
-  const existing = await prisma.order.findFirst({
+    // First verify the order belongs to this restaurant
+    const existing = await prisma.order.findFirst({
       where: { id, restaurantId: session.user.restaurantId },
     });
 
@@ -35,15 +35,16 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-  const order = await prisma.order.update({
-    where: { id },
-    data: { status },
-    include: { items: true },
-  });
+    // Now update by id only (Prisma requires unique field in where)
+    const order = await prisma.order.update({
+      where: { id },
+      data: { status },
+      include: { items: true },
+    });
 
-  return NextResponse.json(order);
-} catch (error) {
-  console.error("Error updating order:", error);
-  return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-}
+    return NextResponse.json(order);
+  } catch (error) {
+    console.error("PATCH order error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
