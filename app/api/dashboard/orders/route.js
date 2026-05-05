@@ -25,17 +25,20 @@ export async function PATCH(request) {
 
   try {
     const { id, status } = await request.json();
+    
+    console.log("PATCH called with:", { id, status });
+    console.log("Session user:", session.user);
 
-    // First verify the order belongs to this restaurant
     const existing = await prisma.order.findFirst({
       where: { id, restaurantId: session.user.restaurantId },
     });
+
+    console.log("Found order:", existing);
 
     if (!existing) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    // Now update by id only (Prisma requires unique field in where)
     const order = await prisma.order.update({
       where: { id },
       data: { status },
@@ -44,7 +47,7 @@ export async function PATCH(request) {
 
     return NextResponse.json(order);
   } catch (error) {
-    console.error("PATCH order error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("PATCH order error FULL:", error);
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
   }
 }
