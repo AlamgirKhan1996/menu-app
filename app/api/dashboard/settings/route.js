@@ -26,6 +26,7 @@ export async function PATCH(request) {
     tagline, taglineAr,
     greetingMessage, awayMessage,
     openTime, closeTime,
+    onboardingComplete,
   } = body;
 
   await prisma.restaurant.update({
@@ -41,6 +42,8 @@ export async function PATCH(request) {
       accentColor: accentColor || undefined,
       tagline: tagline || undefined,
       taglineAr: taglineAr || undefined,
+      // ✅ Save onboardingComplete flag
+      ...(onboardingComplete !== undefined && { onboardingComplete }),
     },
   });
 

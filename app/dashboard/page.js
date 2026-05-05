@@ -44,8 +44,8 @@ export default function DashboardPage() {
   async function checkOnboarding() {
     const res = await fetch("/api/dashboard/settings");
     const data = await res.json();
-    // If no logo and no cover, they're new — send to onboarding
-    if (!data.logo && !data.coverImage && !data.onboardingComplete) {
+    // ✅ Only redirect if onboardingComplete is explicitly false
+    if (data.onboardingComplete === false) {
       router.push("/dashboard/onboarding");
     }
   }
