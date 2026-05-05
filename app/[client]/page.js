@@ -9,6 +9,7 @@ export default async function ClientPage({ params }) {
       include: {
         categories: true,
         menuItems: {
+          where: { isArchived: true },
           include: { category: true },
           orderBy: { order: "asc" },
         },
