@@ -24,13 +24,13 @@ export async function PATCH(request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const { id, status } = await request.json();
+    const { orderId, status } = await request.json();
     
-    console.log("PATCH called with:", { id, status });
+    console.log("PATCH called with:", { orderId, status });
     console.log("Session user:", session.user);
 
     const existing = await prisma.order.findFirst({
-      where: { id, restaurantId: session.user.restaurantId },
+      where: { id: orderId, restaurantId: session.user.restaurantId },
     });
 
     console.log("Found order:", existing);
@@ -40,7 +40,7 @@ export async function PATCH(request) {
     }
 
     const order = await prisma.order.update({
-      where: { id },
+      where: { id: orderId },
       data: { status },
       include: { items: true },
     });
