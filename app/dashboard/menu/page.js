@@ -5,7 +5,7 @@ import ImageUploader from "@/components/ImageUploader";
 import { canAddMoreItems, getFeatures } from "@/lib/planAccess";
 
 
-const PLANS = sessssion?.user?.plan || "trial";
+const PLANS = session?.user?.plan || "trial";
 const FEATURES = getFeatures(PLANS);
 const itemCount = menuItems.length;
 const canAdd = canAddMoreItems(PLANS, itemCount);
