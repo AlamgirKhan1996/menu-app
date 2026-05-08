@@ -1,11 +1,8 @@
 "use client";
 
-import { getServerSession} from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import ImageUploader from "@/components/ImageUploader";
 import { canAddMoreItems, getFeatures } from "@/lib/planAccess";
-
-const session = getServerSession();
 
 const PLANS = session?.user?.plan || "trial";
 const FEATURES = getFeatures(PLANS);
