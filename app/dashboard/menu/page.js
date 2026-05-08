@@ -36,7 +36,8 @@ export default function MenuPage() {
 
 const PLANS = "trial";
 const FEATURES = getFeatures(PLANS);
-const canAdd = canAddMoreItems(PLANS);
+const itemCount = menuItems.length;
+const canAdd = canAddMoreItems(PLANS, itemCount);
 
   const fetchAll = useCallback(async () => {
     try {
@@ -246,7 +247,7 @@ const canAdd = canAddMoreItems(PLANS);
           </button>
           {activeTab === "items" && (
             canAdd ? (
-              <button onClick={openAdd}>+ Add Item</button>
+              <button onClick={() => setShowForm(true)}>+ Add Item</button>
             ) : (
               <div style={{
                 background: "rgba(239,68,68,.1)",
