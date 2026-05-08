@@ -9,7 +9,7 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 }, {plan: restaurant?.plan || "trial"});
     }
 
     if (!session.user?.restaurantId) {
@@ -20,7 +20,7 @@ export async function GET() {
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: session.user.restaurantId },
-      include: { settings: true },
+      select: { settings: true, plan: true },
     });
 
     if (!restaurant) {

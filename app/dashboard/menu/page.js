@@ -34,10 +34,18 @@ export default function MenuPage() {
   const [filterCat, setFilterCat] = useState("all");
   const [editingCat, setEditingCat] = useState(null);
 
-const PLANS = "trial";
-const FEATURES = getFeatures(PLANS);
-const itemCount = menuItems.length;
-const canAdd = canAddMoreItems(PLANS, itemCount);
+const [plan, setPlan] = useState("trial");
+
+useEffect(() => {
+  fetch("/api/dashboard/settings")
+    .then(r => r.json())
+    .then(d => { if (d?.plan) setPlan(d.plan); })
+    .catch(() => {});
+}, []);
+
+const features = getFeatures(plan);
+const itemCount = items.length;
+const canAdd = canAddMoreItems(plan, itemCount);
 
   const fetchAll = useCallback(async () => {
     try {
@@ -247,8 +255,20 @@ const canAdd = canAddMoreItems(PLANS, itemCount);
           </button>
           {activeTab === "items" && (
             canAdd ? (
-              <button onClick={() => setShowForm(true)}>+ Add Item</button>
-            ) : (
+  <button
+    onClick={openAdd}
+    style={{
+      padding: "10px 18px",
+      background: "linear-gradient(135deg, #25D366, #128C7E)",
+      border: "none", borderRadius: 10,
+      color: "#fff", fontSize: 13,
+      fontWeight: 700, cursor: "pointer",
+      fontFamily: "inherit",
+    }}
+  >
+    + Add Item
+  </button>
+ ) : (
               <div style={{
                 background: "rgba(239,68,68,.1)",
                 border: "1px solid rgba(239,68,68,.2)",
@@ -260,7 +280,7 @@ const canAdd = canAddMoreItems(PLANS, itemCount);
                 alignItems: "center",
                 gap: 8,
               }}>
-                🔒 Menu item limit reached ({features.maxMenuItems} items on {plan} plan).{" "}
+                🔒 Limit reached ({features.maxMenuItems} items on {plan} plan).{" "}
                 <a href="/dashboard/upgrade" style={{ color: "#D4A853", fontWeight: 700 }}>
                   Upgrade →
                 </a>

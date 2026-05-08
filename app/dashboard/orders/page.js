@@ -405,10 +405,17 @@ export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("active"); 
   const [historyRange, setHistoryRange] = useState("today"); // "7days" | "30days" | "90days"
   const [updatingId, setUpdatingId] = useState(null);
+  const [plan, setPlan] = useState("trial");
   const { playAlert } = useOrderSound();
   const isFirstLoad = useRef(true);
   const seenFirstOrders = useRef(new Set()); // track which customers already got greeting
 
+  useEffect(() => {
+  fetch("/api/dashboard/settings")
+    .then(r => r.json())
+    .then(d => { if (d?.plan) setPlan(d.plan); })
+    .catch(() => {});
+}, []);
   // Fetch settings once
   useEffect(() => {
     (async () => {

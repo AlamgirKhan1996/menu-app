@@ -8,8 +8,14 @@ export default function AnalyticsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("week");
+  const [plan, setPlan] = useState("trial"); 
 
-  const plan = session?.user?.plan || "trial";
+  useEffect(() => {
+    fetch("/api/dashboard/settings")
+      .then(r => r.json())
+      .then(d => { if (d?.plan) setPlan(d.plan); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/dashboard/analytics")
