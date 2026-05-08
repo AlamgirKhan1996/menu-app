@@ -20,11 +20,22 @@ export async function GET() {
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: session.user.restaurantId },
-      select: { settings: true, plan: true },
+      select: { settings: true, 
+        plan: true, 
+        id: true,
+    name: true,
+    nameAr: true,
+    slug: true,
+  }
     });
+    const validPlans = ["trial", "starter", "pro", "enterprise"];
+const normalizedPlan = validPlans.includes(restaurant.plan) ? restaurant.plan : "trial";
+
 
     if (!restaurant) {
-      return NextResponse.json({ onboardingComplete: true });
+      return NextResponse.json({ onboardingComplete: true },
+        {plan: normalizedPlan}
+      );
     }
 
     return NextResponse.json(restaurant);
