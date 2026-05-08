@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import PlanGate from "@/components/PlanGate";
+import { canUseAnalytics } from "@/lib/planAccess";
 
 export default function AnalyticsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("week");
+
+  const plan = session?.user?.plan || "trial";
 
   useEffect(() => {
     fetch("/api/dashboard/analytics")
@@ -62,6 +66,7 @@ export default function AnalyticsPage() {
   );
 
   return (
+    <PlanGate requiredPlan="pro" currentPlan={plan} featureName="Analytics">
     <div style={{ padding: "24px 20px", maxWidth: 1100, margin: "0 auto", color: "#fff", fontFamily: "-apple-system, sans-serif" }}>
 
       {/* Header */}
@@ -389,5 +394,6 @@ export default function AnalyticsPage() {
       </div>
 
     </div>
-  );
+      </PlanGate>
+      );
 }

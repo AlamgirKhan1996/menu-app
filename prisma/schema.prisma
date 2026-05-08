@@ -26,7 +26,7 @@ model Restaurant {
   descriptionAr String?
   address       String?
   city          String? // "Madinah"
-  plan          Plan      @default(FREE)
+  plan          String    @default("trial") // trial | starter | pro | enterprise
   planExpiry    DateTime?
   isActive      Boolean   @default(true)
   isOpen        Boolean   @default(true) // Restaurant open/closed toggle

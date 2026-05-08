@@ -402,7 +402,8 @@ export default function OrdersPage() {
   const [newFlash, setNewFlash] = useState(false);
   const [waModal, setWaModal] = useState(null); // { message, phone, onDone }
   const [settings, setSettings] = useState(null);
-  const [activeTab, setActiveTab] = useState("active"); // "active" | "history"
+  const [activeTab, setActiveTab] = useState("active"); 
+  const [historyRange, setHistoryRange] = useState("today"); // "7days" | "30days" | "90days"
   const [updatingId, setUpdatingId] = useState(null);
   const { playAlert } = useOrderSound();
   const isFirstLoad = useRef(true);
@@ -417,8 +418,9 @@ export default function OrdersPage() {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await fetch("/api/dashboard/orders?includeRecent=true");
+      const res = await fetch(`/api/dashboard/orders?range=${historyRange}`);
       const data = await res.json();
+      setOrders(data.orders || []); // support both { orders: [...] } and [...] formats
       if (!Array.isArray(data)) return;
 
       const currentIds = new Set(data.map(o => o.id));
@@ -438,13 +440,11 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [lastOrderIds, playAlert]);
+  }, [lastOrderIds, playAlert, historyRange]);
 
   useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 8000);
-    return () => clearInterval(interval);
-  }, [fetchOrders]);
+  if (activeTab === "history") fetchOrders();
+}, [historyRange, activeTab]);
 
   // Handle status update with WhatsApp prompt
   async function handleStatusUpdate(order, newStatus) {
@@ -799,6 +799,71 @@ export default function OrdersPage() {
         {/* ── HISTORY TAB ── */}
         {activeTab === "history" && (
           <div>
+    {/* Plan-aware range buttons */}
+    <div style={{
+      display: "flex",
+      gap: 6,
+      marginBottom: 16,
+      flexWrap: "wrap",
+    }}>
+      {[
+        { key: "today",  label: "Today",      plans: ["trial","starter","pro","enterprise"] },
+        { key: "7days",  label: "Last 7 Days", plans: ["starter","pro","enterprise"] },
+        { key: "30days", label: "Last 30 Days", plans: ["pro","enterprise"] },
+        { key: "all",    label: "All Time",    plans: ["enterprise"] },
+      ].map(({ key, label, plans }) => {
+        const allowed = plans.includes(plan);
+        return (
+          <button
+            key={key}
+            onClick={() => allowed && setHistoryRange(key)}
+            style={{
+              padding: "6px 14px",
+              borderRadius: 99,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: allowed ? "pointer" : "not-allowed",
+              border: historyRange === key
+                ? "1px solid #D4A853"
+                : "1px solid rgba(255,255,255,.1)",
+              background: historyRange === key
+                ? "rgba(212,168,83,.15)"
+                : "rgba(255,255,255,.04)",
+              color: !allowed
+                ? "rgba(255,255,255,.25)"
+                : historyRange === key ? "#D4A853" : "rgba(255,255,255,.6)",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+            }}
+          >
+            {!allowed && "🔒 "}
+            {label}
+          </button>
+        );
+      })}
+    </div>
+
+    {/* Upgrade hint if on trial/starter */}
+    {(plan === "trial" || plan === "starter") && (
+      <div style={{
+        background: "rgba(212,168,83,.06)",
+        border: "1px solid rgba(212,168,83,.15)",
+        borderRadius: 10,
+        padding: "10px 14px",
+        fontSize: 12,
+        color: "rgba(255,255,255,.5)",
+        marginBottom: 16,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        <span>🔒 Upgrade to Pro for 90-day history</span>
+        <a href="/dashboard/upgrade" style={{ color: "#D4A853", fontWeight: 700, fontSize: 12 }}>
+          Upgrade →
+        </a>
+      </div>
+    )}
             {historyOrders.length === 0 ? (
               <div style={{
                 textAlign: "center",

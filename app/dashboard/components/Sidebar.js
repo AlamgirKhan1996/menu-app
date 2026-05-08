@@ -13,6 +13,23 @@ const links = [
   { href: "/dashboard/settings", icon: "⚙️", label: "Settings" },
 ];
 
+// Plan colors
+const planColors = {
+  trial: "#6B7280",
+  starter: "#3B82F6",
+  pro: "#D4A853",
+  enterprise: "#8B5CF6",
+};
+
+const planLabel = {
+  trial: "Free Trial",
+  starter: "Starter",
+  pro: "Pro ⭐",
+  enterprise: "Enterprise 👑",
+};
+
+const plan = session?.user?.plan || "trial";
+
 export default function Sidebar({ restaurant }) {
   const pathname = usePathname();
 
@@ -62,6 +79,23 @@ export default function Sidebar({ restaurant }) {
           </div>
         </div>
       </div>
+
+      // Add this badge below the restaurant name in sidebar:
+<div style={{
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 5,
+  background: `${planColors[plan]}18`,
+  border: `1px solid ${planColors[plan]}35`,
+  borderRadius: 99,
+  padding: "2px 10px",
+  fontSize: 11,
+  fontWeight: 700,
+  color: planColors[plan],
+  marginTop: 4,
+}}>
+  {planLabel[plan]}
+</div>
 
       {/* Nav Links */}
       <nav style={{ flex: 1, padding: "16px 12px" }}>

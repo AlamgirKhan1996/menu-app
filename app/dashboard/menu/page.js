@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import ImageUploader from "@/components/ImageUploader";
+import { canAddMoreItems, getFeatures } from "@/lib/planAccess";
+
+
+const PLANS = sessssion?.user?.plan || "trial";
+const FEATURES = getFeatures(PLANS);
+const itemCount = menuItems.length;
+const canAdd = canAddMoreItems(PLANS, itemCount);
 
 const EMOJIS = ["🍔", "🍕", "🍗", "🥩", "🌮", "🥗", "🍜", "🍛", "🍣", "🥪", "🍟", "🧆", "🥙", "🫕", "🍖", "🥘", "🫔", "🧇", "🥞", "🧈", "🍳", "🥚", "🧀", "🥓", "🌭", "🫓", "🥨", "🥐", "🍩", "🍪", "🎂", "🍰", "🧁", "🍦", "☕", "🧃", "🥤", "🍵", "🧋", "🍺"];
 
@@ -238,19 +245,26 @@ export default function MenuPage() {
             {activeTab === "items" ? "⚙️ Categories" : "🍽️ Items"}
           </button>
           {activeTab === "items" && (
-            <button
-              onClick={openAdd}
-              style={{
-                padding: "10px 20px",
-                background: "linear-gradient(135deg, #25D366, #128C7E)",
-                border: "none", borderRadius: 10,
-                color: "#fff", fontSize: 13,
-                fontWeight: 700, cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              + Add Item
-            </button>
+            canAdd ? (
+              <button onClick={() => setShowForm(true)}>+ Add Item</button>
+            ) : (
+              <div style={{
+                background: "rgba(239,68,68,.1)",
+                border: "1px solid rgba(239,68,68,.2)",
+                borderRadius: 10,
+                padding: "10px 16px",
+                fontSize: 13,
+                color: "#EF4444",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}>
+                🔒 Menu item limit reached ({features.maxMenuItems} items on {plan} plan).{" "}
+                <a href="/dashboard/upgrade" style={{ color: "#D4A853", fontWeight: 700 }}>
+                  Upgrade →
+                </a>
+              </div>
+            )
           )}
         </div>
       </div>
