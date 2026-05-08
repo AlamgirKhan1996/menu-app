@@ -4,10 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import ImageUploader from "@/components/ImageUploader";
 import { canAddMoreItems, getFeatures } from "@/lib/planAccess";
 
-const PLANS = session?.user?.plan || "trial";
-const FEATURES = getFeatures(PLANS);
-const itemCount = menuItems.length;
-const canAdd = canAddMoreItems(PLANS, itemCount);
+
 
 const EMOJIS = ["🍔", "🍕", "🍗", "🥩", "🌮", "🥗", "🍜", "🍛", "🍣", "🥪", "🍟", "🧆", "🥙", "🫕", "🍖", "🥘", "🫔", "🧇", "🥞", "🧈", "🍳", "🥚", "🧀", "🥓", "🌭", "🫓", "🥨", "🥐", "🍩", "🍪", "🎂", "🍰", "🧁", "🍦", "☕", "🧃", "🥤", "🍵", "🧋", "🍺"];
 
@@ -36,6 +33,11 @@ export default function MenuPage() {
   const [savingCat, setSavingCat] = useState(false);
   const [filterCat, setFilterCat] = useState("all");
   const [editingCat, setEditingCat] = useState(null);
+
+const PLANS = "trial";
+const FEATURES = getFeatures(PLANS);
+const itemCount = menuItems.length;
+const canAdd = canAddMoreItems(PLANS, itemCount);
 
   const fetchAll = useCallback(async () => {
     try {
@@ -245,7 +247,7 @@ export default function MenuPage() {
           </button>
           {activeTab === "items" && (
             canAdd ? (
-              <button onClick={() => setShowForm(true)}>+ Add Item</button>
+              <button onClick={openAdd}>+ Add Item</button>
             ) : (
               <div style={{
                 background: "rgba(239,68,68,.1)",
