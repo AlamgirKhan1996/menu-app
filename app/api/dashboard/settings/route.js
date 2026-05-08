@@ -9,42 +9,43 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 }, {plan: restaurant?.plan || "trial"});
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!session.user?.restaurantId) {
-      // SUPER_ADMIN or detached account: return safe defaults so the client
-      // doesn't crash trying to read fields off null.
-      return NextResponse.json({ onboardingComplete: true });
+      return NextResponse.json({ onboardingComplete: true, plan: "trial" });
     }
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: session.user.restaurantId },
-      select: { settings: true, 
-        plan: true, 
+      select: {
         id: true,
-    name: true,
-    nameAr: true,
-    slug: true,
-  }
+        name: true,
+        nameAr: true,
+        slug: true,
+        plan: true,
+        settings: true,
+      },
     });
-    const validPlans = ["trial", "starter", "pro", "enterprise"];
-const normalizedPlan = validPlans.includes(restaurant.plan) ? restaurant.plan : "trial";
-
 
     if (!restaurant) {
-      return NextResponse.json({ onboardingComplete: true },
-        {plan: normalizedPlan}
-      );
+      return NextResponse.json({ onboardingComplete: true, plan: "trial" });
     }
 
-    return NextResponse.json(restaurant);
+    // ✅ Normalize plan AFTER null check
+    const validPlans = ["trial", "starter", "pro", "enterprise"];
+    const normalizedPlan = validPlans.includes(restaurant.plan)
+      ? restaurant.plan
+      : "trial";
+
+    return NextResponse.json({
+      ...restaurant,
+      plan: normalizedPlan,
+    });
+
   } catch (err) {
     console.error("[/api/dashboard/settings GET] error:", err);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -103,11 +104,9 @@ export async function PATCH(request) {
     });
 
     return NextResponse.json({ success: true });
+
   } catch (err) {
     console.error("[/api/dashboard/settings PATCH] error:", err);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
