@@ -36,7 +36,6 @@ export default function MenuPage() {
 
 const PLANS = "trial";
 const FEATURES = getFeatures(PLANS);
-const itemCount = menuItems.length;
 const canAdd = canAddMoreItems(PLANS, itemCount);
 
   const fetchAll = useCallback(async () => {
