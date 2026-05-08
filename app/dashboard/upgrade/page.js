@@ -251,7 +251,14 @@ export default function UpgradePage() {
 
   useEffect(() => {
     setMounted(true);
-    fetch("/api/dashboard/trial").then(r => r.json()).then(setTrial);
+    (async () => {
+      try {
+        const res = await fetch("/api/dashboard/trial");
+        const text = await res.text();
+        if (!text) return;
+        setTrial(JSON.parse(text));
+      } catch (e) {}
+    })();
   }, []);
 
   const plan = PLANS.find(p => p.id === selectedPlan);

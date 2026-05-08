@@ -174,8 +174,14 @@ export default function SettingsPage() {
   useEffect(() => { fetchSettings(); }, []);
 
   async function fetchSettings() {
-    const res = await fetch("/api/dashboard/settings");
-    const data = await res.json();
+    let data = {};
+    try {
+      const res = await fetch("/api/dashboard/settings");
+      const text = await res.text();
+      data = text ? JSON.parse(text) : {};
+    } catch (e) {
+      data = {};
+    }
     setSlug(data.slug || "");
     setOriginalName(data.name || "");
     setForm({

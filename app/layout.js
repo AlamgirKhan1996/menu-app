@@ -1,4 +1,3 @@
-import { format } from "path";
 import "./globals.css";
 import { AuthProvider } from "@/components/Providers";
 
@@ -41,9 +40,12 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{
           __html: `
             if ("serviceWorker" in navigator) {
-            window.addEventListener("load",  function() {
-              navigator.serviceWorker.register("/sw.js").then(reg => console.log("Service Worker registered")).catch(err => console);
-            });
+              window.addEventListener("load", function() {
+                navigator.serviceWorker.register("/sw.js")
+                  .then(function(reg) { console.log("Service Worker registered"); })
+                  .catch(function(err) { console.error("SW registration failed", err); });
+              });
+            }
           `
         }} />
       </body>

@@ -411,9 +411,14 @@ export default function OrdersPage() {
 
   // Fetch settings once
   useEffect(() => {
-    fetch("/api/dashboard/settings")
-      .then(r => r.json())
-      .then(d => setSettings(d));
+    (async () => {
+      try {
+        const res = await fetch("/api/dashboard/settings");
+        const text = await res.text();
+        if (!text) return;
+        setSettings(JSON.parse(text));
+      } catch (e) {}
+    })();
   }, []);
 
   const fetchOrders = useCallback(async () => {

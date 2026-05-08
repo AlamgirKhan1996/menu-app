@@ -7,9 +7,19 @@ export default function TrialBanner() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    fetch("/api/dashboard/trial")
-      .then(r => r.json())
-      .then(setTrial);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/dashboard/trial");
+        const text = await res.text();
+        if (!text) return;
+        const data = JSON.parse(text);
+        if (!cancelled) setTrial(data);
+      } catch (e) {
+        // swallow — banner just won't render
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   if (!trial || trial.status === "PAID" || dismissed) return null;

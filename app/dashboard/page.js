@@ -28,29 +28,41 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function fetchStats() {
-      const [ordersRes, menuRes] = await Promise.all([
-        fetch("/api/dashboard/orders"),
-        fetch("/api/dashboard/menu"),
-      ]);
-      const ordersData = await ordersRes.json();
-      const menuData = await menuRes.json();
-      setOrders(ordersData);
-      setMenuCount(menuData.length);
-      setLoading(false);
+      try {
+        const [ordersRes, menuRes] = await Promise.all([
+          fetch("/api/dashboard/orders"),
+          fetch("/api/dashboard/menu"),
+        ]);
+        const ordersData = ordersRes.ok ? await ordersRes.json() : [];
+        const menuData = menuRes.ok ? await menuRes.json() : [];
+        setOrders(Array.isArray(ordersData) ? ordersData : []);
+        setMenuCount(Array.isArray(menuData) ? menuData.length : 0);
+      } catch (e) {
+        setOrders([]);
+        setMenuCount(0);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchStats();
   }, []);
   useEffect(() => {
-  async function checkOnboarding() {
-    const res = await fetch("/api/dashboard/settings");
-    const data = await res.json();
-    // ✅ Only redirect if onboardingComplete is explicitly false
-    if (data.onboardingComplete === false) {
-      router.push("/dashboard/onboarding");
+    async function checkOnboarding() {
+      try {
+        const res = await fetch("/api/dashboard/settings");
+        if (!res.ok) return;
+        const text = await res.text();
+        if (!text) return;
+        const data = JSON.parse(text);
+        if (data && data.onboardingComplete === false) {
+          router.push("/dashboard/onboarding");
+        }
+      } catch (e) {
+        // ignore — leave user on dashboard
+      }
     }
-  }
-  checkOnboarding();
-}, []);
+    checkOnboarding();
+  }, []);
 
 
   const newOrders = orders.filter(o => o.status === "NEW").length;
