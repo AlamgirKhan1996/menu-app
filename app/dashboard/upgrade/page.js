@@ -108,6 +108,8 @@ const PAYMENT_METHODS = [
   },
 ];
 
+const WHATSAPP_NUMBER = "966595632609";
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function PlanCard({ plan, selected, onSelect, billing }) {
   const price = billing === "annual" ? plan.priceAnnual : plan.price;
