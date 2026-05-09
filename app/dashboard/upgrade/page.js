@@ -10,7 +10,7 @@ const PLANS = [
     name: "Starter",
     nameAr: "المبتدئ",
     price: 99,
-    priceAnnual: 79,
+    priceAnnual: 89,
     color: "#64748B",
     icon: "🌱",
     badge: null,
@@ -31,7 +31,7 @@ const PLANS = [
     name: "Pro Restaurant",
     nameAr: "المطعم الاحترافي",
     price: 199,
-    priceAnnual: 159,
+    priceAnnual: 169,
     color: "#25D366",
     icon: "⭐",
     badge: "MOST POPULAR · الأكثر طلباً",
@@ -52,7 +52,7 @@ const PLANS = [
     name: "Enterprise",
     nameAr: "المؤسسي",
     price: 399,
-    priceAnnual: 319,
+    priceAnnual: 339,
     color: "#D4A853",
     icon: "👑",
     badge: "FOR CHAINS · للسلاسل",
@@ -77,47 +77,36 @@ const PAYMENT_METHODS = [
     name: "Barq",
     nameAr: "برق",
     icon: "⚡",
-    gradient: "linear-gradient(135deg, #1a1a2e, #16213e)",
-    border: "rgba(99,179,237,.3)",
-    glow: "rgba(99,179,237,.15)",
-    tagline: "Fast & Secure · سريع وآمن",
-    number: "0595632609", // ← YOUR Barq number
-    holder: "Alamgir Khan — OrderFlow",
-    steps: ["Open Barq app", "Send to 0595632609", "Screenshot receipt", "Upload below ↓"],
-    stepsAr: ["افتح تطبيق برق", "أرسل إلى 0595632609", "خذ لقطة شاشة للإيصال", "ارفع الإيصال أدناه ↓"],
-    color: "#63B3ED",
-  },
-  {
-    id: "stc",
-    name: "STC Pay",
-    nameAr: "STC Pay",
-    icon: "💜",
-    gradient: "linear-gradient(135deg, #2d1b69, #1a0f42)",
-    border: "rgba(109,40,217,.35)",
-    glow: "rgba(109,40,217,.15)",
-    tagline: "Most popular in Saudi · الأكثر استخداماً",
-    number: "0595632609", // ← YOUR STC number (same or different)
-    holder: "Alamgir Khan — OrderFlow",
-    steps: ["Open STC Pay app", "Send to 0595632609", "Screenshot receipt", "Upload below ↓"],
-    stepsAr: ["افتح تطبيق STC Pay", "أرسل إلى 0595632609", "خذ لقطة شاشة للإيصال", "ارفع الإيصال أدناه ↓"],
-    color: "#A78BFA",
+    gradient: "linear-gradient(135deg, #0a1628, #0d2045)",
+    border: "rgba(251,191,36,.3)",
+    glow: "rgba(251,191,36,.12)",
+    tagline: "ادفع عبر برق · Pay via Barq",
+    color: "#FBBF24",
+    bankDetails: [
+      { label: "Bank · البنك",         value: "Arab National Bank (ANB)" },
+      { label: "Name · الاسم",          value: "ALAMGIR KHAN MUHTAJ" },
+      { label: "IBAN · آيبان",          value: "SA7030100991109106066485" },
+      { label: "Account · رقم الحساب", value: "991109106066485" },
+    ],
   },
   {
     id: "bank",
     name: "Bank Transfer",
     nameAr: "تحويل بنكي",
     icon: "🏦",
-    gradient: "linear-gradient(135deg, #1a2e1a, #0f2010)",
+    gradient: "linear-gradient(135deg, #0a1a0a, #0d200d)",
     border: "rgba(37,211,102,.2)",
     glow: "rgba(37,211,102,.08)",
-    tagline: "IBAN transfer · تحويل آيبان",
-    number: null,
-    holder: null,
+    tagline: "تحويل بنكي مباشر · Direct bank transfer",
     color: "#25D366",
+    bankDetails: [
+      { label: "Bank · البنك",         value: "Arab National Bank (ANB)" },
+      { label: "Name · الاسم",          value: "ALAMGIR KHAN MUHTAJ" },
+      { label: "IBAN · آيبان",          value: "SA7030100991109106066485" },
+      { label: "Account · رقم الحساب", value: "991109106066485" },
+    ],
   },
 ];
-
-const WHATSAPP_NUMBER = "966595632609";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function PlanCard({ plan, selected, onSelect, billing }) {
@@ -607,208 +596,205 @@ export default function UpgradePage() {
           </div>
 
           {/* Payment details */}
-          {selectedMethod !== "bank" && method?.number && (
-            <div style={{
-              background: method.gradient,
-              border: `1px solid ${method.border}`,
-              borderRadius: 16,
-              padding: "20px",
-              marginBottom: 20,
-              boxShadow: `0 8px 32px ${method.glow}`,
+          {/* Payment Details — works for both Barq and Bank */}
+<div style={{
+  background: method.gradient,
+  border: `1px solid ${method.border}`,
+  borderRadius: 16,
+  padding: "20px",
+  marginBottom: 20,
+  boxShadow: `0 8px 32px ${method.glow}`,
+}}>
+  <div style={{
+    fontSize: 12, fontWeight: 700,
+    color: "rgba(255,255,255,.4)",
+    marginBottom: 14,
+    letterSpacing: ".06em",
+    textTransform: "uppercase",
+  }}>
+    {selectedMethod === "barq"
+      ? "⚡ أرسل المبلغ عبر برق لهذا الحساب · Send via Barq to this account"
+      : "🏦 حوّل المبلغ لهذا الحساب · Transfer to this account"}
+  </div>
+
+  {/* Account details */}
+  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+    {method.bankDetails.map(({ label, value }) => {
+      const isIban = label.includes("IBAN") || label.includes("Account");
+      return (
+        <div key={label} style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "10px 14px",
+          background: "rgba(0,0,0,.25)",
+          borderRadius: 10,
+          gap: 12,
+          flexWrap: "wrap",
+        }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>
+            {label}
+          </div>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8,
+          }}>
+            <span style={{
+              fontSize: isIban ? 12 : 13,
+              fontWeight: 700,
+              color: "#fff",
+              fontFamily: isIban ? "monospace" : "inherit",
+              letterSpacing: isIban ? 1 : 0,
             }}>
-              {/* Account info */}
-              <div style={{
-                background: "rgba(0,0,0,.35)",
-                borderRadius: 12,
-                padding: "16px 18px",
-                marginBottom: 16,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}>
-                <div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>
-                    {method.name} Number · رقم {method.nameAr}
-                  </div>
-                  <div style={{
-                    fontSize: 22,
-                    fontWeight: 900,
-                    color: "#fff",
-                    letterSpacing: 2,
-                    fontFamily: "monospace",
-                  }}>
-                    {method.number}
-                  </div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 4 }}>
-                    {method.holder}
-                  </div>
-                </div>
-                <button
-                  onClick={copyNumber}
-                  style={{
-                    padding: "10px 16px",
-                    background: copied ? "rgba(37,211,102,.2)" : `${method.color}20`,
-                    border: copied ? "1px solid rgba(37,211,102,.4)" : `1px solid ${method.color}40`,
-                    borderRadius: 10,
-                    color: copied ? "#25D366" : method.color,
-                    fontSize: 12, fontWeight: 700,
-                    cursor: "pointer", fontFamily: "inherit",
-                    transition: "all .2s",
-                    flexShrink: 0,
-                  }}
-                >
-                  {copied ? "✅ Copied!" : "📋 Copy"}
-                </button>
-              </div>
-
-              {/* Steps */}
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 6,
-              }}>
-                {method.steps.map((step, i) => (
-                  <div key={i} style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 8,
-                    fontSize: 12,
-                    color: "rgba(255,255,255,.6)",
-                    lineHeight: 1.4,
-                  }}>
-                    <span style={{
-                      width: 18, height: 18, flexShrink: 0,
-                      borderRadius: "50%",
-                      background: `${method.color}25`,
-                      border: `1px solid ${method.color}40`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 9, fontWeight: 900,
-                      color: method.color,
-                    }}>
-                      {i + 1}
-                    </span>
-                    <span>{step}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Bank transfer — WhatsApp CTA */}
-          {selectedMethod === "bank" && (
-            <div style={{
-              background: "rgba(37,211,102,.06)",
-              border: "1px solid rgba(37,211,102,.15)",
-              borderRadius: 16,
-              padding: "20px",
-              marginBottom: 20,
-              textAlign: "center",
-            }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>🏦</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
-                Get IBAN Details
-              </div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 16 }}>
-                Contact us on WhatsApp for bank transfer details
-              </div>
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=أريد الدفع عن طريق التحويل البنكي لخطة ${plan.name} - SAR ${price}/month`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "12px 24px",
-                  background: "linear-gradient(135deg, #25D366, #128C7E)",
-                  borderRadius: 12,
-                  color: "#fff",
-                  fontSize: 13,
-                  fontWeight: 800,
-                  textDecoration: "none",
-                }}
-              >
-                💬 WhatsApp for IBAN
-              </a>
-            </div>
-          )}
-
-          {/* Receipt upload */}
-          {selectedMethod !== "bank" && (
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 10 }}>
-                📸 Upload Payment Receipt · ارفع إيصال الدفع
-              </div>
-              <label style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                border: receipt
-                  ? "2px solid rgba(37,211,102,.4)"
-                  : "2px dashed rgba(255,255,255,.12)",
-                borderRadius: 14,
-                padding: "28px 20px",
-                cursor: "pointer",
-                background: receipt ? "rgba(37,211,102,.05)" : "rgba(255,255,255,.02)",
-                transition: "all .25s",
-                gap: 8,
-              }}>
-                {uploading ? (
-                  <>
-                    <div style={{ fontSize: 32 }}>⏳</div>
-                    <div style={{ fontSize: 13, color: "#25D366", fontWeight: 700 }}>Uploading...</div>
-                  </>
-                ) : receipt ? (
-                  <>
-                    <div style={{ fontSize: 32 }}>✅</div>
-                    <div style={{ fontSize: 13, color: "#25D366", fontWeight: 700 }}>Receipt uploaded!</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>Tap to change · اضغط للتغيير</div>
-                  </>
-                ) : (
-                  <>
-                    <div style={{ fontSize: 32 }}>📸</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", fontWeight: 600 }}>
-                      Upload receipt screenshot
-                    </div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>
-                      ارفع لقطة شاشة الإيصال
-                    </div>
-                  </>
-                )}
-                <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleReceiptUpload} />
-              </label>
-            </div>
-          )}
-
-          {/* Submit / Confirm */}
-          {selectedMethod !== "bank" && (
+              {value}
+            </span>
             <button
-              onClick={submitConfirmation}
-              disabled={!receipt}
+              onClick={() => {
+                navigator.clipboard.writeText(value);
+              }}
               style={{
-                width: "100%",
-                padding: "16px",
-                background: receipt
-                  ? "linear-gradient(135deg, #25D366, #128C7E)"
-                  : "rgba(255,255,255,.06)",
-                border: "none",
-                borderRadius: 14,
-                color: receipt ? "#fff" : "rgba(255,255,255,.25)",
-                fontSize: 15,
-                fontWeight: 900,
-                cursor: receipt ? "pointer" : "not-allowed",
-                fontFamily: "inherit",
-                marginBottom: 10,
-                transition: "all .3s",
-                boxShadow: receipt ? "0 8px 32px rgba(37,211,102,.3)" : "none",
-                letterSpacing: "-.01em",
+                padding: "3px 8px",
+                background: `${method.color}20`,
+                border: `1px solid ${method.color}30`,
+                borderRadius: 6,
+                color: method.color,
+                fontSize: 10, fontWeight: 700,
+                cursor: "pointer", fontFamily: "inherit",
               }}
             >
-              💬 Confirm Payment · تأكيد الدفع
+              📋
             </button>
-          )}
+          </div>
+        </div>
+      );
+    })}
+  </div>
 
+  {/* Amount to send */}
+  <div style={{
+    background: `${method.color}15`,
+    border: `1px solid ${method.color}30`,
+    borderRadius: 12,
+    padding: "14px 16px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
+  }}>
+    <div style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>
+      Amount to send · المبلغ المطلوب
+    </div>
+    <div style={{ fontSize: 22, fontWeight: 900, color: method.color }}>
+      SAR {price}
+    </div>
+  </div>
+
+  {/* Steps */}
+  <div style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 8,
+  }}>
+    {(selectedMethod === "barq" ? [
+      "افتح تطبيق برق · Open Barq",
+      "اختار تحويل · Choose Transfer",
+      "أدخل تفاصيل الحساب · Enter details",
+      "ارفع الإيصال أدناه ↓ · Upload receipt",
+    ] : [
+      "افتح تطبيقك البنكي · Open banking app",
+      "اختار تحويل آيبان · Choose IBAN transfer",
+      "أدخل تفاصيل الحساب · Enter details",
+      "ارفع الإيصال أدناه ↓ · Upload receipt",
+    ]).map((step, i) => (
+      <div key={i} style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 8,
+        fontSize: 11,
+        color: "rgba(255,255,255,.55)",
+        lineHeight: 1.5,
+      }}>
+        <span style={{
+          width: 18, height: 18, flexShrink: 0,
+          borderRadius: "50%",
+          background: `${method.color}20`,
+          border: `1px solid ${method.color}35`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 9, fontWeight: 900, color: method.color,
+        }}>
+          {i + 1}
+        </span>
+        {step}
+      </div>
+    ))}
+  </div>
+</div>
+
+{/* Receipt upload — show for both methods */}
+<div style={{ marginBottom: 20 }}>
+  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 10 }}>
+    📸 Upload Payment Receipt · ارفع إيصال الدفع
+  </div>
+  <label style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    border: receipt
+      ? "2px solid rgba(37,211,102,.4)"
+      : "2px dashed rgba(255,255,255,.12)",
+    borderRadius: 14,
+    padding: "28px 20px",
+    cursor: "pointer",
+    background: receipt ? "rgba(37,211,102,.05)" : "rgba(255,255,255,.02)",
+    transition: "all .25s",
+    gap: 8,
+  }}>
+    {uploading ? (
+      <>
+        <div style={{ fontSize: 32 }}>⏳</div>
+        <div style={{ fontSize: 13, color: "#25D366", fontWeight: 700 }}>Uploading...</div>
+      </>
+    ) : receipt ? (
+      <>
+        <div style={{ fontSize: 32 }}>✅</div>
+        <div style={{ fontSize: 13, color: "#25D366", fontWeight: 700 }}>Receipt uploaded!</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>Tap to change · اضغط للتغيير</div>
+      </>
+    ) : (
+      <>
+        <div style={{ fontSize: 32 }}>📸</div>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", fontWeight: 600 }}>
+          Upload receipt screenshot · ارفع لقطة الإيصال
+        </div>
+      </>
+    )}
+    <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleReceiptUpload} />
+  </label>
+</div>
+
+{/* Submit */}
+<button
+  onClick={submitConfirmation}
+  disabled={!receipt}
+  style={{
+    width: "100%",
+    padding: "16px",
+    background: receipt
+      ? "linear-gradient(135deg, #25D366, #128C7E)"
+      : "rgba(255,255,255,.06)",
+    border: "none",
+    borderRadius: 14,
+    color: receipt ? "#fff" : "rgba(255,255,255,.25)",
+    fontSize: 15, fontWeight: 900,
+    cursor: receipt ? "pointer" : "not-allowed",
+    fontFamily: "inherit",
+    marginBottom: 10,
+    transition: "all .3s",
+    boxShadow: receipt ? "0 8px 32px rgba(37,211,102,.3)" : "none",
+  }}
+>
+  💬 Confirm Payment via WhatsApp · تأكيد الدفع
+</button>
           <button
             onClick={() => setStep(1)}
             style={{
