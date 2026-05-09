@@ -234,10 +234,10 @@ enum Role {
 }
 
 enum Plan {
-  FREE // 30 orders/month
-  PRO // SAR 299/month - unlimited + dashboard
-  GROWTH // SAR 699/month - + Instagram AI
-  EMPIRE // SAR 1499/month - + multi-branch
+  trial
+  starter
+  pro
+  enterprise
 }
 
 enum OrderStatus {
