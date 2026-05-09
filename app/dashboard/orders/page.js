@@ -454,9 +454,17 @@ export default function OrdersPage() {
     }
   }, [lastOrderIds, playAlert, historyRange]);
 
-  useEffect(() => {
+  // ✅ Initial load + auto-refresh every 8 seconds
+useEffect(() => {
+  fetchOrders(); // load immediately
+  const interval = setInterval(fetchOrders, 8000); // refresh every 8s
+  return () => clearInterval(interval);
+}, [fetchOrders]);
+
+// ✅ Reload when history range changes
+useEffect(() => {
   if (activeTab === "history") fetchOrders();
-}, [historyRange, activeTab]);
+}, [historyRange]);
 
   // Handle status update with WhatsApp prompt
   async function handleStatusUpdate(order, newStatus) {
