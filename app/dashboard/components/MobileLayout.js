@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import InstallPWA from "@/components/InstallPWA";
+import { useLang } from "@/lib/i18n";
 
 const navLinks = [
   { href: "/dashboard",          icon: "🏠", label: "Home"     },
@@ -28,6 +29,8 @@ export default function MobileLayout({ children, session }) {
 
   const plan = session?.user?.plan || "trial";
   const planCfg = PLAN_CONFIG[plan] || PLAN_CONFIG.trial;
+
+  const { lang } = useLang();
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -193,6 +196,7 @@ export default function MobileLayout({ children, session }) {
 
 // ── SIDEBAR CONTENT ──────────────────────────────────────────────────────────
 function SidebarContent({ session, pathname, plan, planCfg }) {
+  const { lang, toggleLang } = useLang();
   return (
     <>
       {/* Logo + Restaurant + Badge */}
@@ -312,6 +316,47 @@ function SidebarContent({ session, pathname, plan, planCfg }) {
           </a>
         </div>
       )}
+
+      {/* Sign Out */}
+      {/* Language Toggle */}
+      <div style={{ padding: "0 12px 8px" }}>
+        <button
+          onClick={toggleLang}
+          style={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "10px 12px",
+            borderRadius: 8,
+            background: "rgba(255,255,255,.04)",
+            border: "1px solid rgba(255,255,255,.08)",
+            cursor: "pointer",
+            fontFamily: "inherit",
+            transition: "all .15s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.08)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,.04)"}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 18 }}>🌐</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>
+              {lang === "ar" ? "اللغة" : "Language"}
+            </span>
+          </div>
+          <div style={{
+            background: "rgba(37,211,102,.12)",
+            border: "1px solid rgba(37,211,102,.2)",
+            borderRadius: 99,
+            padding: "3px 10px",
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#25D366",
+          }}>
+            {lang === "ar" ? "🇸🇦 عربي" : "🇬🇧 EN"}
+          </div>
+        </button>
+      </div>
 
       {/* Sign Out */}
       <div style={{ padding: "12px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
